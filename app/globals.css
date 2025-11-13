@@ -122,12 +122,23 @@
 		@apply border-border outline-ring/50;
 	}
 	body {
-		@apply bg-background text-foreground;
+		@apply bg-black text-white;
 		overflow-x: hidden;
+		margin: 0 !important;
+		padding: 0 !important;
+		height: 100%;
 	}
 	html {
 		overflow-x: hidden;
 		scroll-behavior: smooth;
+		margin: 0 !important;
+		padding: 0 !important;
+		background: black !important;
+		height: 100%;
+	}
+	#__next {
+		margin: 0;
+		padding: 0;
 	}
 	* {
 		scroll-behavior: smooth;
@@ -184,4 +195,29 @@
 
 .delay-2000 {
 	animation-delay: 2s;
+}
+
+/* Marquee animation */
+@keyframes marquee {
+	0% {
+		transform: translateX(0);
+	}
+	100% {
+		transform: translateX(-50%);
+	}
+}
+
+.animate-marquee {
+	animation: marquee 30s linear infinite;
+}
+
+/* Remove number input spinners */
+input[type="number"] {
+	-moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
 }

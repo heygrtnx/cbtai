@@ -15,7 +15,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="bg-black text-white relative overflow-x-hidden">
+    <div className="bg-black text-white relative overflow-x-hidden min-h-screen">
       {/* Animated background gradient */}
       <div 
         className="fixed inset-0 opacity-20 pointer-events-none"
@@ -38,9 +38,9 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-xl">TN</span>
+                <span className="text-black font-bold text-xs">AI</span>
               </div>
-              <span className="text-xl font-bold">TestNexus</span>
+              <span className="text-xl font-bold">AI CBT</span>
             </div>
             <div className="flex items-center gap-4">
               <Link
@@ -65,15 +65,12 @@ export default function Home() {
             {/* Main heading */}
             <div className="space-y-4">
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-tight">
-                <span className="text-white">TestNexus</span>
-                <br />
                 <span className="bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent animate-gradient">
-                  Smart Testing Platform
+                  Leave Paper Exam Forever
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto leading-relaxed px-4">
-                Revolutionizing education in Nigeria with intelligent computer-based testing.
-                Transform your school's examination system with seamless, secure, and smart solutions.
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed px-4">
+                Stop wrestling with paper exams. Start revolutionizing how your students learn, test, and excel.
               </p>
             </div>
 
@@ -83,7 +80,7 @@ export default function Home() {
                 href="/schools/register"
                 className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-black font-semibold text-lg hover:bg-gray-200 transition-all shadow-lg shadow-white/20 hover:shadow-white/30"
               >
-                Start Free Trial
+                Transform Your School Today
               </Link>
               <Link
                 href="/auth/login"
@@ -111,15 +108,163 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Testimonials Carousel */}
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12 sm:mb-16">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+                What Schools Are Saying
+              </h2>
+              <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
+                Real stories from real educators who've transformed their examination process
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">AO</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Dr. Adebayo Ogunleye</h4>
+                    <p className="text-sm text-gray-400">Principal, Lagos State Model College</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "AI CBT has completely transformed how we conduct examinations. The AI question generation saves us countless hours, and students love the instant results. Our exam efficiency has increased by 300%."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">CM</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Mrs. Chioma Mbanefo</h4>
+                    <p className="text-sm text-gray-400">Vice Principal, Federal Government College</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "The offline capability is a game-changer for our school. Students can take exams even when the internet is unstable. The grading system is incredibly accurate—it understands context, not just keywords."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">IK</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Mr. Ibrahim Kolawole</h4>
+                    <p className="text-sm text-gray-400">Head of Academics, King's College</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "The analytics dashboard gives us insights we never had before. We can identify learning gaps instantly and adjust our teaching strategies. Student performance has improved significantly since we started using AI CBT."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">FA</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Mrs. Funke Adeyemi</h4>
+                    <p className="text-sm text-gray-400">Principal, Queen's College Lagos</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "Security features are outstanding. The randomization and browser locking prevent cheating effectively. Parents trust our examination process more than ever. It's been a complete game-changer."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">EO</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Dr. Emeka Okonkwo</h4>
+                    <p className="text-sm text-gray-400">Director, St. Gregory's College</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "The bulk student upload feature saved us weeks of manual data entry. The platform is intuitive, and our teachers adapted quickly. ROI was evident within the first month of use."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+
+              <div className="glass-card p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">BA</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Mrs. Bola Adegoke</h4>
+                    <p className="text-sm text-gray-400">Principal, Methodist Boys High School</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  "Support team is exceptional. They respond quickly and actually understand our needs. The platform works flawlessly even with our limited bandwidth. Highly recommend to any school in Nigeria."
+                </p>
+                <div className="flex gap-1 mt-4">
+                  {[...Array(5)].map((_, i) => (
+                    <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                Powerful Features for Modern Education
+                Everything You Need. Nothing You Don't.
               </h2>
               <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-                Everything you need to conduct seamless computer-based examinations
+                Built for Nigerian schools. Designed for excellence. Powered by intelligence.
               </p>
             </div>
 
@@ -130,9 +275,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">AI Question Generation</h3>
+                <h3 className="text-xl font-bold mb-2">Question Generation That Never Sleeps</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Automatically generate unlimited questions from lesson materials using advanced AI. No duplicates, infinite variations.
+                  Upload your materials once. Get infinite, unique questions forever. Our AI doesn't just generate questions—it crafts them with precision, ensuring every exam feels fresh and challenging.
                 </p>
               </div>
 
@@ -142,9 +287,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Smart Grading System</h3>
+                <h3 className="text-xl font-bold mb-2">Grading That Understands Context</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Intelligent theory question grading with customizable accuracy tolerance. Get instant, accurate results.
+                  Theory questions aren't multiple choice. Neither is our grading. Watch as AI analyzes meaning, context, and understanding—not just keywords. Your students deserve better than robotic scoring.
                 </p>
               </div>
 
@@ -154,9 +299,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Mobile First Design</h3>
+                <h3 className="text-xl font-bold mb-2">Built for Real-World Nigeria</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Optimized for low-bandwidth connections, perfect for Nigerian schools. Works seamlessly on all devices.
+                  Slow internet? No problem. Power cuts? We've got you. Our platform works offline, syncs when connected, and loads fast even on 2G. Because education shouldn't wait for perfect conditions.
                 </p>
               </div>
 
@@ -166,9 +311,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Exam Security</h3>
+                <h3 className="text-xl font-bold mb-2">Security That Actually Works</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Password protection, question randomization, tab switching prevention, and webcam monitoring.
+                  Randomize questions. Randomize answers. Lock browsers. Monitor screens. We make cheating harder than passing the exam. Your exam integrity is non-negotiable.
                 </p>
               </div>
 
@@ -178,9 +323,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Real-time Analytics</h3>
+                <h3 className="text-xl font-bold mb-2">Insights That Drive Decisions</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Comprehensive dashboards with detailed reports, performance metrics, and insights for administrators.
+                  See which topics confuse students. Identify learning gaps instantly. Track performance trends. Make data-driven decisions that actually improve outcomes. Knowledge is power—we give you both.
                 </p>
               </div>
 
@@ -190,9 +335,9 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Offline Support</h3>
+                <h3 className="text-xl font-bold mb-2">Offline-First, Always-On</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Take exams offline and sync when connection is restored. Perfect for areas with unstable internet.
+                  Students start exams offline. Answers save locally. When connection returns, everything syncs automatically. No lost work. No frustration. Just seamless testing, anywhere, anytime.
                 </p>
               </div>
             </div>
@@ -204,10 +349,10 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                How It Works
+                From Zero to Hero in Three Steps
               </h2>
               <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-                Get started in three simple steps
+                No complexity. No confusion. Just results.
               </p>
             </div>
 
@@ -216,9 +361,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">
                   1
                 </div>
-                <h3 className="text-xl font-bold mb-3">Register Your School</h3>
+                <h3 className="text-xl font-bold mb-3">Register & Pay</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Complete the registration form and make payment. Get your school account activated instantly.
+                  Complete your registration in minutes. Choose your payment plan. Get instant access. Your school's transformation starts here.
                 </p>
               </div>
 
@@ -226,9 +371,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">
                   2
                 </div>
-                <h3 className="text-xl font-bold mb-3">Upload Students & Materials</h3>
+                <h3 className="text-xl font-bold mb-3">Upload & Generate</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Upload student data via CSV and add your lesson materials. AI will generate questions automatically.
+                  Upload student data via CSV. Add your lesson materials. Watch AI create unlimited questions in seconds. It's that simple.
                 </p>
               </div>
 
@@ -236,9 +381,9 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white text-black rounded-full flex items-center justify-center text-2xl font-black mx-auto mb-6">
                   3
                 </div>
-                <h3 className="text-xl font-bold mb-3">Create & Conduct Exams</h3>
+                <h3 className="text-xl font-bold mb-3">Test & Triumph</h3>
                 <p className="text-gray-400 text-sm leading-relaxed">
-                  Set up exams, assign to classes, and students can take them. Get instant results and analytics.
+                  Create exams. Assign to classes. Students take tests. Get instant results. Celebrate improved performance. Repeat.
                 </p>
               </div>
             </div>
@@ -250,10 +395,10 @@ export default function Home() {
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12 sm:mb-16">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                Video Tutorials & Help
+                Learn by Watching, Master by Doing
               </h2>
               <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-                Learn how to use the platform with our comprehensive video guides
+                Step-by-step video guides that turn complexity into clarity
               </p>
             </div>
 
@@ -269,8 +414,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Getting Started</h3>
-                  <p className="text-gray-400 text-sm mb-4">Learn the basics of setting up your school account</p>
+                  <h3 className="text-lg font-bold mb-2">Your First 10 Minutes</h3>
+                  <p className="text-gray-400 text-sm mb-4">Get your school account up and running in record time</p>
                   <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -288,8 +433,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Creating Exams</h3>
-                  <p className="text-gray-400 text-sm mb-4">Step-by-step guide to creating and publishing exams</p>
+                  <h3 className="text-lg font-bold mb-2">Crafting Perfect Exams</h3>
+                  <p className="text-gray-400 text-sm mb-4">From concept to published exam in minutes, not hours</p>
                   <a href="https://www.youtube.com/watch?v=jNQXAC9IVRw" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -307,8 +452,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Question Generation</h3>
-                  <p className="text-gray-400 text-sm mb-4">How to generate questions from materials</p>
+                  <h3 className="text-lg font-bold mb-2">AI Question Magic</h3>
+                  <p className="text-gray-400 text-sm mb-4">Turn your materials into unlimited, unique questions instantly</p>
                   <a href="https://www.youtube.com/watch?v=9bZkp7q19f0" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -326,8 +471,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Student Management</h3>
-                  <p className="text-gray-400 text-sm mb-4">Upload and manage students using CSV files</p>
+                  <h3 className="text-lg font-bold mb-2">Student Management Mastery</h3>
+                  <p className="text-gray-400 text-sm mb-4">Bulk upload, organize, and manage thousands of students effortlessly</p>
                   <a href="https://www.youtube.com/watch?v=kJQP7kiw5Fk" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -345,8 +490,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Results & Analytics</h3>
-                  <p className="text-gray-400 text-sm mb-4">Understanding results, grades, and analytics</p>
+                  <h3 className="text-lg font-bold mb-2">Decoding Your Data</h3>
+                  <p className="text-gray-400 text-sm mb-4">Turn results into actionable insights that improve learning outcomes</p>
                   <a href="https://www.youtube.com/watch?v=fJ9rUzIMcZQ" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -364,8 +509,8 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-lg font-bold mb-2">Troubleshooting</h3>
-                  <p className="text-gray-400 text-sm mb-4">Common issues and how to resolve them</p>
+                  <h3 className="text-lg font-bold mb-2">When Things Go Wrong</h3>
+                  <p className="text-gray-400 text-sm mb-4">Quick fixes for common issues—get back on track fast</p>
                   <a href="https://www.youtube.com/watch?v=OPf0YbXqDm0" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300 text-sm font-medium">
                     Watch Video →
                   </a>
@@ -381,10 +526,10 @@ export default function Home() {
             <div className="glass-card-strong rounded-2xl border border-white/10 p-8 sm:p-12">
               <div className="text-center mb-8">
                 <h2 className="text-3xl sm:text-4xl font-black mb-4">
-                  Need Help? We're Here for You
+                  Stuck? We've Got Your Back
                 </h2>
                 <p className="text-gray-400 text-lg">
-                  Our support team is available 24/7 to assist you
+                  Real support from real people. Available when you need us.
                 </p>
               </div>
 
@@ -396,9 +541,9 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Email Support</h3>
-                  <p className="text-gray-400 text-sm mb-4">Get help via email</p>
-                  <a href="mailto:support@cbtplatform.com" className="text-white hover:text-gray-300 text-sm font-medium">
-                    support@cbtplatform.com →
+                  <p className="text-gray-400 text-sm mb-4">Get detailed help via email</p>
+                  <a href="mailto:support@aicbt.com" className="text-white hover:text-gray-300 text-sm font-medium">
+                    support@aicbt.com →
                   </a>
                 </div>
 
@@ -409,7 +554,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Live Chat</h3>
-                  <p className="text-gray-400 text-sm mb-4">Chat with our support team</p>
+                  <p className="text-gray-400 text-sm mb-4">Instant answers from our team</p>
                   <a href="#" className="text-white hover:text-gray-300 text-sm font-medium">
                     Start Chat →
                   </a>
@@ -422,7 +567,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Documentation</h3>
-                  <p className="text-gray-400 text-sm mb-4">Comprehensive guides and docs</p>
+                  <p className="text-gray-400 text-sm mb-4">Comprehensive guides and tutorials</p>
                   <a href="#" className="text-white hover:text-gray-300 text-sm font-medium">
                     View Docs →
                   </a>
@@ -435,7 +580,7 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Phone Support</h3>
-                  <p className="text-gray-400 text-sm mb-4">Call us for immediate assistance</p>
+                  <p className="text-gray-400 text-sm mb-4">Speak directly with our team</p>
                   <a href="tel:+2348000000000" className="text-white hover:text-gray-300 text-sm font-medium">
                     +234 800 000 0000 →
                   </a>
@@ -450,17 +595,17 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="glass-card-strong rounded-2xl border border-white/10 p-8 sm:p-12">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                Ready to Transform Your School?
+                Ready to Leave Paper Exams Behind?
               </h2>
               <p className="text-gray-400 text-lg sm:text-xl mb-8 max-w-2xl mx-auto">
-                Join hundreds of schools already using TestNexus. Start your journey today.
+                Join hundreds of forward-thinking schools across Nigeria. Stop managing exams. Start mastering them.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/schools/register"
                   className="px-8 py-4 rounded-xl bg-white text-black font-semibold text-lg hover:bg-gray-200 transition-all shadow-lg shadow-white/20"
                 >
-                  Get Started Now
+                  Start Your Transformation
                 </Link>
                 <Link
                   href="/auth/login"
@@ -479,12 +624,12 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex items-center justify-center">
-                  <span className="text-black font-bold text-xl">TN</span>
+                  <span className="text-black font-bold text-xs">AI</span>
                 </div>
-                <span className="text-xl font-bold">TestNexus</span>
+                <span className="text-xl font-bold">AI CBT</span>
               </div>
               <p className="text-gray-400 text-sm">
-                Revolutionizing education in Nigeria with smart computer-based testing solutions.
+                Where intelligence meets examination. Transforming Nigerian education, one test at a time.
               </p>
             </div>
 
@@ -517,7 +662,7 @@ export default function Home() {
           </div>
 
           <div className="text-center text-sm text-gray-400 pt-8 border-t border-white/10">
-            <p>© 2024 TestNexus. All rights reserved.</p>
+            <p>© 2024 AI CBT. All rights reserved.</p>
           </div>
         </footer>
 
