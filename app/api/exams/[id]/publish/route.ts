@@ -59,7 +59,10 @@ export async function POST(
       exam: updatedExam,
     })
   } catch (error) {
-    console.error("Exam publish error:", error)
+    console.error("❌ [EXAM PUBLISH] Exam publish error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [EXAM PUBLISH] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Failed to publish exam" },
       { status: 500 }

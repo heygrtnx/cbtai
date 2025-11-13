@@ -151,7 +151,10 @@ export async function POST(request: NextRequest) {
       message: `Successfully created ${results.created} student(s)`,
     })
   } catch (error) {
-    console.error("Student upload error:", error)
+    console.error("❌ [STUDENT UPLOAD] Student upload error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [STUDENT UPLOAD] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Failed to upload students" },
       { status: 500 }

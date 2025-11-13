@@ -24,11 +24,27 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      // Build credentials object - only include fields that are actually provided
+      const credentials: Record<string, string> = {}
+      
+      if (loginType === "accessCode") {
+        if (formData.accessCode && formData.accessCode.trim()) {
+          credentials.accessCode = formData.accessCode.trim()
+        }
+      } else {
+        if (formData.email && formData.email.trim()) {
+          credentials.email = formData.email.trim()
+        }
+        if (formData.phone && formData.phone.trim()) {
+          credentials.phone = formData.phone.trim()
+        }
+        if (formData.password) {
+          credentials.password = formData.password
+        }
+      }
+
       const result = await signIn("credentials", {
-        email: formData.email || undefined,
-        phone: formData.phone || undefined,
-        password: formData.password || undefined,
-        accessCode: formData.accessCode || undefined,
+        ...credentials,
         redirect: false,
       })
 

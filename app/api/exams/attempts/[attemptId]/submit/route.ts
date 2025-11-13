@@ -198,7 +198,10 @@ export async function POST(
       },
     })
   } catch (error) {
-    console.error("Exam submission error:", error)
+    console.error("❌ [EXAM SUBMIT] Exam submission error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [EXAM SUBMIT] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Failed to submit exam" },
       { status: 500 }

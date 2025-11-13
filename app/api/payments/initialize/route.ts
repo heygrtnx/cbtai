@@ -92,7 +92,10 @@ export async function POST(request: NextRequest) {
       method,
     })
   } catch (error) {
-    console.error("Payment initialization error:", error)
+    console.error("❌ [PAYMENT INIT] Payment initialization error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [PAYMENT INIT] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Payment initialization failed" },
       { status: 500 }

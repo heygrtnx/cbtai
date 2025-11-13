@@ -30,7 +30,7 @@ export async function sendSMS(
 
     return { success: false }
   } catch (error) {
-    console.error("SMS sending error:", error)
+    console.error("❌ [SMS] SMS sending error:", error instanceof Error ? error.message : error)
     return { success: false }
   }
 }
@@ -45,15 +45,47 @@ export async function sendWhatsApp(
   return { success: true }
 }
 
-// Email notification
+// Email notification using Google SMTP (Gmail)
 export async function sendEmail(
   to: string,
   subject: string,
   html: string
-): Promise<{ success: boolean }> {
-  // Implement email service (SendGrid, Mailgun, etc.)
-  // For now, return success
-  return { success: true }
+): Promise<{ success: boolean; messageId?: string }> {
+  try {
+    // Use Google SMTP (Gmail)
+    if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      const nodemailer = await import("nodemailer")
+
+      // Create transporter for Gmail
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS, // Use App Password for Gmail
+        },
+      })
+
+      // Send email
+      const info = await transporter.sendMail({
+        from: process.env.EMAIL_FROM || `"AI CBT" <${process.env.SMTP_USER}>`,
+        to: to,
+        subject: subject,
+        html: html,
+      })
+
+      return { success: true, messageId: info.messageId }
+    }
+
+    // If no email service configured, return error
+    console.error("❌ [EMAIL] Email service not configured. Please set SMTP_USER and SMTP_PASS in .env")
+    return { success: false }
+  } catch (error) {
+    console.error("❌ [EMAIL] Email sending error:", error instanceof Error ? error.message : error)
+    return { success: false }
+  }
 }
 
 export async function sendAccessCodeNotification(

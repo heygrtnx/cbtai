@@ -153,7 +153,10 @@ export async function POST(
       },
     })
   } catch (error) {
-    console.error("Exam attempt error:", error)
+    console.error("❌ [EXAM ATTEMPT] Exam attempt error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [EXAM ATTEMPT] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Failed to start exam attempt" },
       { status: 500 }

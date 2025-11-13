@@ -153,7 +153,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.error("Exam creation error:", error)
+    console.error("❌ [EXAM CREATE] Exam creation error:", error instanceof Error ? error.message : error)
+    if (error instanceof Error) {
+      console.error("❌ [EXAM CREATE] Error stack:", error.stack)
+    }
     return NextResponse.json(
       { error: "Failed to create exam" },
       { status: 500 }

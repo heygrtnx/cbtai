@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { MaxWidthWrapper, cn, ThemeProvider } from "@/lib";
+import { cn, ThemeProvider } from "@/lib";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 import { Header } from "@/components/reusables";
+import { HeroUIProviderWrapper } from "@/components/providers/hero-ui-provider";
 
 export const metadata: Metadata = {
 	title: "Create Next App",
@@ -35,22 +36,24 @@ export default function RootLayout({
 					defaultTheme="light"
 					enableSystem
 					disableTransitionOnChange>
-					<NextTopLoader
-						color="#000000"
-						showSpinner={false}
-						easing="ease"
-					/>
-					<Header />
-					<main className="w-full">
-						{children}
-					</main>
+					<HeroUIProviderWrapper>
+						<NextTopLoader
+							color="#000000"
+							showSpinner={false}
+							easing="ease"
+						/>
+						<Header />
+						<main className="w-full">
+							{children}
+						</main>
 
-					<Toaster
-						position="top-right"
-						expand={false}
-					/>
-					{process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
-					{process.env.NEXT_PUBLIC_GTM_ID && <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />}
+						<Toaster
+							position="top-right"
+							expand={false}
+						/>
+						{process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+						{process.env.NEXT_PUBLIC_GTM_ID && <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />}
+					</HeroUIProviderWrapper>
 				</ThemeProvider>
 			</body>
 		</html>

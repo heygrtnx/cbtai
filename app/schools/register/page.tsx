@@ -78,7 +78,7 @@ export default function RegisterSchoolPage() {
     }
   }
 
-  const handlePayment = async (method: "PAYSTACK" | "FLUTTERWAVE" | "BANK_TRANSFER") => {
+  const handlePayment = async () => {
     if (!fees) return
 
     setLoading(true)
@@ -91,7 +91,7 @@ export default function RegisterSchoolPage() {
         body: JSON.stringify({
           schoolId: schoolId,
           amount: fees.total,
-          method,
+          method: "PAYSTACK",
         }),
       })
 
@@ -101,10 +101,7 @@ export default function RegisterSchoolPage() {
         throw new Error(data.error || "Payment initialization failed")
       }
 
-      if (method === "BANK_TRANSFER") {
-        alert("Please upload payment proof. You will receive instructions via email.")
-        router.push("/")
-      } else if (data.authorizationUrl) {
+      if (data.authorizationUrl) {
         window.location.href = data.authorizationUrl
       }
     } catch (err: any) {
@@ -150,27 +147,13 @@ export default function RegisterSchoolPage() {
                 </div>
               )}
 
-              <div className="space-y-3">
+              <div>
                 <button
-                  onClick={() => handlePayment("PAYSTACK")}
+                  onClick={handlePayment}
                   disabled={loading}
                   className="w-full bg-white text-black py-4 px-6 rounded-xl hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all shadow-lg shadow-white/20"
                 >
                   {loading ? "Processing..." : "Pay with Paystack"}
-                </button>
-                <button
-                  onClick={() => handlePayment("FLUTTERWAVE")}
-                  disabled={loading}
-                  className="w-full glass-card border border-white/20 py-4 px-6 rounded-xl hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
-                >
-                  {loading ? "Processing..." : "Pay with Flutterwave"}
-                </button>
-                <button
-                  onClick={() => handlePayment("BANK_TRANSFER")}
-                  disabled={loading}
-                  className="w-full glass-card border border-white/20 py-4 px-6 rounded-xl hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
-                >
-                  {loading ? "Processing..." : "Bank Transfer (Upload Proof)"}
                 </button>
               </div>
 

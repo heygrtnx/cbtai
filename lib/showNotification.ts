@@ -66,6 +66,6 @@ export const showToast = ({ type, message, duration = 2000, position = "top-cent
 			});
 			break;
 		default:
-			console.warn("Invalid toast type");
+			console.error("❌ [NOTIFICATION] Invalid toast type:", type);
 	}
 };
