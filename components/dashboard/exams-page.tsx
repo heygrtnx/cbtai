@@ -4,29 +4,29 @@ import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem } from "@
 import Link from "next/link"
 import { useState } from "react"
 
-interface Teacher {
+interface Exam {
   id: string
-  subjects: string[]
-  user: {
-    name: string | null
-    email: string | null
-    phone: string | null
-  } | null
+  title: string
+  subject: string
+  type: string
+  status: string
+  createdAt: Date
 }
 
-interface TeachersPageProps {
-  teachers: Teacher[]
+interface ExamsPageProps {
+  exams: Exam[]
   subjects: string[]
+  classes: string[]
 }
 
-export function TeachersPage({ teachers, subjects }: TeachersPageProps) {
+export function ExamsPage({ exams, subjects, classes }: ExamsPageProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [showCSVSample, setShowCSVSample] = useState(false)
 
-  const csvSample = `name,email,phone,staffNumber,subjects,qualifications
-Dr. Adebayo Ogunleye,adebayo.ogunleye@example.com,+2348012345678,STAFF001,"Mathematics,Physics",Ph.D. in Physics
-Mrs. Chioma Mbanefo,chioma.mbanefo@example.com,+2348023456789,STAFF002,"English Language,Literature",M.A. in English
-Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Biology",M.Sc. in Chemistry`
+  const csvSample = `title,subject,type,startDate,endDate,duration,description
+Mathematics Test 1,Mathematics,TEST,2024-12-01 09:00:00,2024-12-01 10:30:00,90,First term mathematics test
+English Language Exam,English Language,EXAMINATION,2024-12-15 08:00:00,2024-12-15 11:00:00,180,End of term examination
+Physics Quiz,Physics,QUIZ,2024-11-20 14:00:00,2024-11-20 14:30:00,30,Weekly physics quiz`
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-x-hidden">
@@ -40,8 +40,8 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
         <div className="w-full px-4 py-4 md:px-6 md:py-6 border-b border-white/10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-white">Manage Teachers</h1>
-              <p className="text-sm md:text-base text-gray-400 mt-1">Add and manage teachers</p>
+              <h1 className="text-2xl md:text-3xl font-black text-white">Manage Exams</h1>
+              <p className="text-sm md:text-base text-gray-400 mt-1">Create and manage exams</p>
             </div>
             <Button
               as={Link}
@@ -56,12 +56,12 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 lg:py-12">
-          {/* Add Teacher Form */}
+          {/* Add Exam Form */}
           {showAddForm && (
             <Card className="bg-white/5 backdrop-blur-xl border border-white/10 mb-6">
               <CardHeader className="p-4 md:p-6 pb-0">
                 <div className="flex items-center justify-between w-full">
-                  <h2 className="text-xl md:text-2xl font-bold text-white">Add Teacher Manually</h2>
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Create Exam Manually</h2>
                   <Button
                     variant="light"
                     onClick={() => setShowAddForm(false)}
@@ -75,46 +75,8 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                 <form className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
-                      label="Full Name"
-                      placeholder="Enter teacher name"
-                      className="text-white"
-                      classNames={{
-                        input: "text-white",
-                        label: "text-gray-400",
-                      }}
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      placeholder="teacher@example.com"
-                      className="text-white"
-                      classNames={{
-                        input: "text-white",
-                        label: "text-gray-400",
-                      }}
-                    />
-                    <Input
-                      label="Phone"
-                      placeholder="+2348012345678"
-                      className="text-white"
-                      classNames={{
-                        input: "text-white",
-                        label: "text-gray-400",
-                      }}
-                    />
-                    <Input
-                      label="Staff Number"
-                      placeholder="STAFF001"
-                      className="text-white"
-                      classNames={{
-                        input: "text-white",
-                        label: "text-gray-400",
-                      }}
-                    />
-                    <Input
-                      label="Password"
-                      type="password"
-                      placeholder="Enter password"
+                      label="Exam Title"
+                      placeholder="e.g., Mathematics Test 1"
                       className="text-white"
                       classNames={{
                         input: "text-white",
@@ -122,9 +84,8 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                       }}
                     />
                     <Select
-                      label="Subjects"
-                      placeholder="Select subjects"
-                      selectionMode="multiple"
+                      label="Subject"
+                      placeholder="Select subject"
                       className="text-white"
                       classNames={{
                         trigger: "text-white",
@@ -137,9 +98,68 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                         </SelectItem>
                       ))}
                     </Select>
+                    <Select
+                      label="Exam Type"
+                      placeholder="Select type"
+                      className="text-white"
+                      classNames={{
+                        trigger: "text-white",
+                        label: "text-gray-400",
+                      }}
+                    >
+                      <SelectItem value="CONTINUOUS_ASSESSMENT" className="text-white">Continuous Assessment</SelectItem>
+                      <SelectItem value="TEST" className="text-white">Test</SelectItem>
+                      <SelectItem value="EXAMINATION" className="text-white">Examination</SelectItem>
+                      <SelectItem value="MOCK_EXAM" className="text-white">Mock Exam</SelectItem>
+                      <SelectItem value="QUIZ" className="text-white">Quiz</SelectItem>
+                    </Select>
                     <Input
-                      label="Qualifications (Optional)"
-                      placeholder="M.Sc. in Mathematics"
+                      label="Duration (minutes)"
+                      type="number"
+                      placeholder="90"
+                      className="text-white"
+                      classNames={{
+                        input: "text-white",
+                        label: "text-gray-400",
+                      }}
+                    />
+                    <Input
+                      label="Start Date & Time"
+                      type="datetime-local"
+                      className="text-white"
+                      classNames={{
+                        input: "text-white",
+                        label: "text-gray-400",
+                      }}
+                    />
+                    <Input
+                      label="End Date & Time"
+                      type="datetime-local"
+                      className="text-white"
+                      classNames={{
+                        input: "text-white",
+                        label: "text-gray-400",
+                      }}
+                    />
+                    <Select
+                      label="Assign to Class"
+                      placeholder="Select class"
+                      selectionMode="multiple"
+                      className="text-white"
+                      classNames={{
+                        trigger: "text-white",
+                        label: "text-gray-400",
+                      }}
+                    >
+                      {classes.map((className) => (
+                        <SelectItem key={className} value={className} className="text-white">
+                          {className}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    <Input
+                      label="Description (Optional)"
+                      placeholder="Exam description"
                       className="text-white"
                       classNames={{
                         input: "text-white",
@@ -152,7 +172,7 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                       type="submit"
                       className="bg-white text-black hover:bg-gray-200 font-semibold"
                     >
-                      Add Teacher
+                      Create Exam
                     </Button>
                     <Button
                       type="button"
@@ -172,7 +192,7 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
           <Card className="bg-white/5 backdrop-blur-xl border border-white/10 mb-6">
             <CardHeader className="p-4 md:p-6 pb-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
-                <h2 className="text-xl md:text-2xl font-bold text-white">Bulk Upload Teachers</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-white">Bulk Upload Exams</h2>
                 <div className="flex gap-3">
                   <Button
                     onClick={() => setShowCSVSample(!showCSVSample)}
@@ -183,7 +203,7 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                   </Button>
                   <Button
                     as={Link}
-                    href="/dashboard/admin/teachers/upload"
+                    href="/dashboard/admin/exams/upload"
                     className="bg-white text-black hover:bg-gray-200 font-semibold"
                   >
                     Upload CSV File
@@ -199,42 +219,42 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                     {csvSample}
                   </pre>
                   <p className="text-xs text-gray-500 mt-3">
-                    Required columns: name, email, phone, staffNumber, subjects (comma-separated), qualifications
+                    Required columns: title, subject, type, startDate, endDate, duration, description
                   </p>
                 </div>
               </CardBody>
             )}
           </Card>
 
-          {/* Teachers List */}
+          {/* Exams List */}
           <Card className="bg-white/5 backdrop-blur-xl border border-white/10 mb-6">
             <CardHeader className="p-4 md:p-6 pb-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
-                <h2 className="text-xl md:text-2xl font-bold text-white">Teachers</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-white">Exams</h2>
                 {!showAddForm && (
                   <Button
                     onClick={() => setShowAddForm(true)}
                     className="bg-white text-black hover:bg-gray-200 font-semibold"
                   >
-                    Add Teacher Manually
+                    Create Exam Manually
                   </Button>
                 )}
               </div>
             </CardHeader>
             <CardBody className="p-4 md:p-6">
-              {teachers.length === 0 ? (
+              {exams.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-gray-400 mb-4">No teachers found.</p>
+                  <p className="text-gray-400 mb-4">No exams found.</p>
                   <div className="flex gap-3 justify-center">
                     <Button
                       onClick={() => setShowAddForm(true)}
                       className="bg-white text-black hover:bg-gray-200 font-semibold"
                     >
-                      Add Teacher Manually
+                      Create Exam Manually
                     </Button>
                     <Button
                       as={Link}
-                      href="/dashboard/admin/teachers/upload"
+                      href="/dashboard/admin/exams/upload"
                       variant="bordered"
                       className="border-white/20 bg-white/5 hover:bg-white/10 text-white"
                     >
@@ -244,20 +264,20 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {teachers.map((teacher) => (
-                    <Card key={teacher.id} className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
+                  {exams.map((exam) => (
+                    <Card key={exam.id} className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
                       <CardBody className="p-4 md:p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                           <div className="flex-1">
-                            <h3 className="font-bold text-white text-base md:text-lg mb-1">{teacher.user?.name || "Unknown"}</h3>
-                            <p className="text-xs md:text-sm text-gray-400 mb-1">Email: {teacher.user?.email || "N/A"}</p>
-                            <p className="text-xs md:text-sm text-gray-400 mb-1">Phone: {teacher.user?.phone || "N/A"}</p>
-                            <p className="text-xs md:text-sm text-gray-400">Subjects: {teacher.subjects.join(", ") || "None"}</p>
+                            <h3 className="font-bold text-white text-base md:text-lg mb-1">{exam.title}</h3>
+                            <p className="text-xs md:text-sm text-gray-400 mb-1">Subject: {exam.subject}</p>
+                            <p className="text-xs md:text-sm text-gray-400 mb-1">Type: {exam.type.replace("_", " ")}</p>
+                            <p className="text-xs md:text-sm text-gray-400">Status: {exam.status}</p>
                           </div>
                           <div className="flex items-center gap-2">
                             <Button
                               as={Link}
-                              href={`/dashboard/admin/teachers/${teacher.id}`}
+                              href={`/dashboard/admin/exams/${exam.id}`}
                               variant="bordered"
                               size="sm"
                               className="border-white/20 bg-white/5 hover:bg-white/10 text-white"
@@ -278,3 +298,4 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
     </div>
   )
 }
+

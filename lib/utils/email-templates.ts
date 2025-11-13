@@ -22,6 +22,100 @@ export interface WelcomeEmailData {
   supportPhone: string
 }
 
+export interface UpgradeEmailData {
+  schoolName: string
+  adminName: string
+  adminEmail: string
+  transactionId: string
+  reference: string
+  amount: number
+  paidAt: Date
+  additionalStudents: number
+  newTotalStudents: number
+  schoolCode: string
+}
+
+export function generateUpgradeEmailHTML(data: UpgradeEmailData): string {
+  const formattedDate = new Date(data.paidAt).toLocaleDateString("en-NG", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+
+  const formattedAmount = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+  }).format(data.amount)
+
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upgrade Successful - AI CBT</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f5f5f5;">
+    <tr>
+      <td style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); border-radius: 12px 12px 0 0;">
+              <div style="display: inline-block; width: 60px; height: 60px; background: #ffffff; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #000000; font-size: 24px; font-weight: bold;">AI</span>
+              </div>
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 800; letter-spacing: -0.5px;">Upgrade Successful! 🎉</h1>
+              <p style="margin: 10px 0 0; color: #cccccc; font-size: 16px;">Your student capacity has been increased</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Dear <strong>${data.adminName}</strong>,</p>
+              <p style="margin: 0 0 30px; color: #555555; font-size: 15px; line-height: 1.6;">Great news! Your upgrade payment has been successfully processed. Your school's student capacity has been increased and you can now add more students to your platform.</p>
+              <div style="background-color: #f8f9fa; border-left: 4px solid #000000; padding: 25px; border-radius: 8px; margin: 30px 0;">
+                <h2 style="margin: 0 0 20px; color: #000000; font-size: 20px; font-weight: 700;">Upgrade Details</h2>
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">School Name:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${data.schoolName}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">School Code:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${data.schoolCode}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">Transaction ID:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${data.transactionId}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">Reference:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${data.reference}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">Payment Date:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${formattedDate}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">Additional Students:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">+${data.additionalStudents.toLocaleString()}</td></tr>
+                  <tr><td style="padding: 10px 0; color: #666666; font-size: 14px; border-bottom: 1px solid #e0e0e0;">New Total Capacity:</td><td style="padding: 10px 0; color: #000000; font-size: 14px; font-weight: 600; text-align: right; border-bottom: 1px solid #e0e0e0;">${data.newTotalStudents.toLocaleString()} students</td></tr>
+                  <tr><td style="padding: 15px 0 10px; color: #000000; font-size: 18px; font-weight: 700;">Amount Paid:</td><td style="padding: 15px 0 10px; color: #000000; font-size: 20px; font-weight: 800; text-align: right;">${formattedAmount}</td></tr>
+                </table>
+              </div>
+              <div style="background-color: #f0f7ff; border-left: 4px solid #0066cc; padding: 25px; border-radius: 8px; margin: 30px 0;">
+                <h3 style="margin: 0 0 15px; color: #0066cc; font-size: 18px; font-weight: 700;">What's Next?</h3>
+                <ul style="margin: 0; padding-left: 20px; color: #333333; font-size: 15px; line-height: 1.8;">
+                  <li>You can now add up to ${data.newTotalStudents.toLocaleString()} students to your platform</li>
+                  <li>Upload new students via CSV or add them manually</li>
+                  <li>All existing students remain unaffected</li>
+                  <li>Your upgrade is effective immediately</li>
+                </ul>
+              </div>
+              <p style="margin: 30px 0 0; color: #555555; font-size: 15px; line-height: 1.6;">Please keep this receipt for your records. If you have any questions or need assistance, don't hesitate to reach out to our support team.</p>
+              <p style="margin: 30px 0 0; color: #333333; font-size: 15px; line-height: 1.6;">Best regards,<br><strong>The AI CBT Team</strong></p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 40px; background-color: #f8f9fa; border-radius: 0 0 12px 12px; text-align: center; border-top: 1px solid #e0e0e0;">
+              <p style="margin: 0 0 10px; color: #666666; font-size: 13px;">This is an automated receipt. Please do not reply to this email.</p>
+              <p style="margin: 0; color: #999999; font-size: 12px;">© ${new Date().getFullYear()} AI CBT Platform. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `
+}
+
 export function generatePaymentReceiptHTML(data: PaymentReceiptData): string {
   const formattedDate = new Date(data.paidAt).toLocaleDateString("en-NG", {
     year: "numeric",

@@ -1,0 +1,15 @@
+import { redirect } from "next/navigation"
+import { requireAuth } from "@/lib/utils/auth"
+import { UserRole } from "@prisma/client"
+import { TeacherUploadPage } from "@/components/dashboard/teacher-upload-page"
+
+export default async function TeacherUploadPageRoute() {
+  const user = await requireAuth(UserRole.SCHOOL_ADMIN)
+
+  if (!user.schoolId) {
+    redirect("/auth/login")
+  }
+
+  return <TeacherUploadPage />
+}
+

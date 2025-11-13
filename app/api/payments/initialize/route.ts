@@ -6,7 +6,7 @@ import crypto from "crypto"
 
 export async function POST(request: NextRequest) {
   try {
-    const { schoolId, amount, method } = await request.json()
+    const { schoolId, amount, method, type, additionalStudents } = await request.json()
 
     if (!schoolId || !amount || !method) {
       return NextResponse.json(
@@ -27,7 +27,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate payment reference
-    const reference = `PAY-${school.schoolCode}-${crypto.randomBytes(8).toString("hex").toUpperCase()}`
+    const referencePrefix = type === "UPGRADE" ? "UPG" : "PAY"
+    const reference = `${referencePrefix}-${school.schoolCode}-${crypto.randomBytes(8).toString("hex").toUpperCase()}`
+
+    // Prepare metadata
+    const metadata: Record<string, any> = {
+      schoolId,
+      schoolCode: school.schoolCode,
+    }
+    
+    if (type === "UPGRADE" && additionalStudents) {
+      metadata.type = "UPGRADE"
+      metadata.additionalStudents = parseInt(additionalStudents)
+    }
 
     // Create payment record
     const payment = await db.payment.create({
@@ -37,7 +49,10 @@ export async function POST(request: NextRequest) {
         method: method as PaymentMethod,
         reference,
         status: PaymentStatus.PENDING,
-        description: `License fee payment for ${school.name}`,
+        description: type === "UPGRADE" 
+          ? `Student capacity upgrade for ${school.name} (+${additionalStudents} students)`
+          : `License fee payment for ${school.name}`,
+        metadata: metadata,
       },
     })
 
@@ -49,7 +64,7 @@ export async function POST(request: NextRequest) {
         amount,
         school.email,
         reference,
-        { schoolId, schoolCode: school.schoolCode }
+        metadata
       )
     } else if (method === PaymentMethod.FLUTTERWAVE) {
       paymentResponse = await initializeFlutterwavePayment(

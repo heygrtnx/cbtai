@@ -180,8 +180,9 @@ export default function RegisterSchoolPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex flex-col items-center justify-center">
                 <span className="text-black font-bold text-xs">AI</span>
+                <span className="text-black font-normal text-[8px] leading-tight">enabled</span>
               </div>
               <span className="text-xl font-bold">AI CBT</span>
             </Link>

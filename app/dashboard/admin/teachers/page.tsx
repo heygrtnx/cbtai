@@ -30,5 +30,9 @@ export default async function AdminTeachersPage() {
     orderBy: { createdAt: "desc" },
   })
 
-  return <TeachersPage teachers={teachers} />
+  // Get subjects from JSON file
+  const classesData = await import("@/data/classes.json")
+  const subjects = classesData.subjects || []
+
+  return <TeachersPage teachers={teachers} subjects={subjects} />
 }

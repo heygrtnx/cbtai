@@ -201,8 +201,9 @@ export default function Home() {
         <nav className="w-full px-4 py-4 md:px-6 md:py-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-white to-gray-400 rounded-lg flex flex-col items-center justify-center">
                 <span className="text-black font-bold text-xs md:text-sm">AI</span>
+                <span className="text-black font-normal text-[7px] md:text-[8px] leading-tight">enabled</span>
               </div>
               <span className="text-lg md:text-xl font-bold">AI CBT</span>
             </div>

@@ -68,8 +68,9 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center gap-2 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-white to-gray-400 rounded-lg flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-white to-gray-400 rounded-lg flex flex-col items-center justify-center">
                 <span className="text-black font-bold text-xs">AI</span>
+                <span className="text-black font-normal text-[8px] leading-tight">enabled</span>
               </div>
               <span className="text-2xl font-bold">AI CBT</span>
             </Link>

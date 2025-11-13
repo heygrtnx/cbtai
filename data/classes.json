@@ -1,0 +1,31 @@
+{
+  "classes": [
+    "JSS1A",
+    "JSS1B",
+    "JSS2A",
+    "JSS2B",
+    "JSS3A",
+    "JSS3B",
+    "SSS1A",
+    "SSS1B",
+    "SSS2A",
+    "SSS2B",
+    "SSS3A",
+    "SSS3B"
+  ],
+  "subjects": [
+    "Mathematics",
+    "English Language",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Geography",
+    "History",
+    "Government",
+    "Economics",
+    "Literature",
+    "Computer Science",
+    "Agricultural Science"
+  ]
+}
+

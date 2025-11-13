@@ -29,9 +29,10 @@ export default async function AdminExamsPage() {
     orderBy: { createdAt: "desc" },
   })
 
-  // Get classes and subjects from environment variables
-  const classes = process.env.CLASSES ? process.env.CLASSES.split(",").map(c => c.trim()) : []
-  const subjects = process.env.SUBJECTS ? process.env.SUBJECTS.split(",").map(s => s.trim()) : []
+  // Get classes and subjects from JSON file
+  const classesData = await import("@/data/classes.json")
+  const classes = classesData.classes || []
+  const subjects = classesData.subjects || []
 
   return <ExamsPage exams={exams} subjects={subjects} classes={classes} />
 }

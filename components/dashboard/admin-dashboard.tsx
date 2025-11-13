@@ -69,7 +69,6 @@ export function AdminDashboard({ user, school, numberOfStudentsPaid, licenseExpi
             isActive={school.isActive}
             licenseExpiry={licenseExpiry ? new Date(licenseExpiry) : null}
             numberOfStudentsPaid={numberOfStudentsPaid}
-            currentStudentsCount={school._count.students}
           />
 
           {/* Stats Grid */}
@@ -137,13 +136,13 @@ export function AdminDashboard({ user, school, numberOfStudentsPaid, licenseExpi
 
                 <Button
                   as={Link}
-                  href="/dashboard/admin/classes"
+                  href="/dashboard/admin/exams"
                   variant="bordered"
                   className="h-auto py-4 border-white/20 bg-white/5 backdrop-blur-md hover:bg-white/10 text-white"
                 >
                   <div className="text-left w-full">
-                    <div className="font-semibold text-sm md:text-base mb-1">Manage Classes</div>
-                    <div className="text-xs text-gray-400">Create and organize classes</div>
+                    <div className="font-semibold text-sm md:text-base mb-1">Manage Exams</div>
+                    <div className="text-xs text-gray-400">Create and manage exams</div>
                   </div>
                 </Button>
 

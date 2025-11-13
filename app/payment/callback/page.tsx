@@ -31,9 +31,15 @@ function PaymentCallbackContent() {
 
         if (data.success) {
           setStatus("success")
-          setMessage("Payment verified successfully! Your school account has been activated.")
+          const isUpgrade = sessionStorage.getItem("upgrade_pending") === "true"
+          setMessage(
+            isUpgrade
+              ? "Upgrade successful! Your student capacity has been increased."
+              : "Payment verified successfully! Your school account has been activated."
+          )
           setTimeout(() => {
-            router.push("/auth/login")
+            sessionStorage.removeItem("upgrade_pending")
+            router.push(isUpgrade ? "/dashboard/admin" : "/auth/login")
           }, 3000)
         } else {
           setStatus("failed")

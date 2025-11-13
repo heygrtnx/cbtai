@@ -3,7 +3,7 @@ import { db } from "@/lib/db"
 import { PaymentStatus } from "@prisma/client"
 import { verifyPaystackPayment } from "@/lib/utils/payment"
 import { sendEmail } from "@/lib/utils/notifications"
-import { generatePaymentReceiptHTML, generateWelcomeEmailHTML } from "@/lib/utils/email-templates"
+import { generatePaymentReceiptHTML, generateWelcomeEmailHTML, generateUpgradeEmailHTML } from "@/lib/utils/email-templates"
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,60 +58,119 @@ export async function POST(request: NextRequest) {
         },
       })
 
-      // Activate school
-      await db.school.update({
-        where: { id: payment.schoolId },
-        data: {
-          isActive: true,
-          licenseExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-        },
-      })
+      // Check if this is an upgrade payment
+      const paymentMetadata = payment.metadata as any
+      const isUpgrade = paymentMetadata?.type === "UPGRADE"
+      const additionalStudents = paymentMetadata?.additionalStudents || 0
 
-      // Get admin user for email
+      if (isUpgrade && additionalStudents > 0) {
+        // Get current school data before update
+        const currentSchool = await db.school.findUnique({
+          where: { id: payment.schoolId },
+          select: { numberOfStudents: true },
+        })
+        
+        // Update school's numberOfStudents
+        await db.school.update({
+          where: { id: payment.schoolId },
+          data: {
+            numberOfStudents: {
+              increment: additionalStudents,
+            },
+          },
+        })
+        
+        // Use updated value for email
+        const newTotalStudents = (currentSchool?.numberOfStudents || 0) + additionalStudents
+        
+        // Get admin user for email
+        const adminUser = payment.school.admins?.[0]
+        if (adminUser && adminUser.email) {
+          // Send upgrade confirmation email
+          const upgradeHTML = generateUpgradeEmailHTML({
+            schoolName: payment.school.name,
+            adminName: adminUser.name || "Administrator",
+            adminEmail: adminUser.email,
+            transactionId: verification.transactionId || updatedPayment.reference,
+            reference: updatedPayment.reference,
+            amount: verification.amount || updatedPayment.amount,
+            paidAt: updatedPayment.paidAt || new Date(),
+            additionalStudents,
+            newTotalStudents,
+            schoolCode: payment.school.schoolCode,
+          })
+
+          await sendEmail(
+            adminUser.email,
+            `Upgrade Successful - ${payment.school.name} | AI CBT`,
+            upgradeHTML
+          )
+        }
+        
+        return NextResponse.json({
+          success: true,
+          status: "completed",
+          message: "Upgrade payment verified and student capacity increased",
+          isUpgrade: true,
+        })
+      } else {
+        // Regular payment - activate school
+        await db.school.update({
+          where: { id: payment.schoolId },
+          data: {
+            isActive: true,
+            licenseExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+          },
+        })
+      }
+
+      // Get admin user for email (for regular payments)
       const adminUser = payment.school.admins?.[0]
       if (adminUser && adminUser.email) {
-        // Calculate fees (we need to get this from the payment or school)
-        const oneTimeFee = parseInt(process.env.LICENSE_FEE || "300000")
-        const perStudentFee = parseInt(process.env.COST_PER_STUDENT || "3000")
-        const numberOfStudents = payment.school.numberOfStudents || 0
+        if (!isUpgrade) {
+          // Regular payment - send receipt and welcome email
+          const oneTimeFee = parseInt(process.env.LICENSE_FEE || "300000")
+          const perStudentFee = parseInt(process.env.COST_PER_STUDENT || "3000")
+          const numberOfStudents = payment.school.numberOfStudents || 0
 
-        // Send Payment Receipt
-        const receiptHTML = generatePaymentReceiptHTML({
-          schoolName: payment.school.name,
-          adminName: adminUser.name || "Administrator",
-          adminEmail: adminUser.email,
-          transactionId: verification.transactionId || updatedPayment.reference,
-          reference: updatedPayment.reference,
-          amount: verification.amount || updatedPayment.amount,
-          paidAt: updatedPayment.paidAt || new Date(),
-          schoolCode: payment.school.schoolCode,
-          oneTimeFee,
-          perStudentFee,
-          numberOfStudents,
-        })
+          // Send Payment Receipt
+          const receiptHTML = generatePaymentReceiptHTML({
+            schoolName: payment.school.name,
+            adminName: adminUser.name || "Administrator",
+            adminEmail: adminUser.email,
+            transactionId: verification.transactionId || updatedPayment.reference,
+            reference: updatedPayment.reference,
+            amount: verification.amount || updatedPayment.amount,
+            paidAt: updatedPayment.paidAt || new Date(),
+            schoolCode: payment.school.schoolCode,
+            oneTimeFee,
+            perStudentFee,
+            numberOfStudents,
+          })
 
-        await sendEmail(
-          adminUser.email,
-          `Payment Receipt - ${payment.school.name} | AI CBT`,
-          receiptHTML
-        )
+          await sendEmail(
+            adminUser.email,
+            `Payment Receipt - ${payment.school.name} | AI CBT`,
+            receiptHTML
+          )
 
-        // Send Welcome Email
-        const welcomeHTML = generateWelcomeEmailHTML({
-          schoolName: payment.school.name,
-          adminName: adminUser.name || "Administrator",
-          adminEmail: adminUser.email,
-          schoolCode: payment.school.schoolCode,
-          loginUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/login`,
-          supportEmail: process.env.SUPPORT_EMAIL || "support@aicbt.com",
-          supportPhone: process.env.SUPPORT_PHONE || "+234 800 000 0000",
-        })
+          // Send Welcome Email
+          const welcomeHTML = generateWelcomeEmailHTML({
+            schoolName: payment.school.name,
+            adminName: adminUser.name || "Administrator",
+            adminEmail: adminUser.email,
+            schoolCode: payment.school.schoolCode,
+            loginUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/login`,
+            supportEmail: process.env.SUPPORT_EMAIL || "support@aicbt.com",
+            supportPhone: process.env.SUPPORT_PHONE || "+234 800 000 0000",
+          })
 
-        await sendEmail(
-          adminUser.email,
-          `Welcome to AI CBT, ${payment.school.name}! 🎉`,
-          welcomeHTML
-        )
+          await sendEmail(
+            adminUser.email,
+            `Welcome to AI CBT, ${payment.school.name}! 🎉`,
+            welcomeHTML
+          )
+        }
       }
 
       return NextResponse.json({
