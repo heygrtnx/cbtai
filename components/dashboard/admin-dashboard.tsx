@@ -4,6 +4,7 @@ import { Card, CardBody, CardHeader, Button } from "@heroui/react"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { LicenseInfo } from "./license-info"
 
 interface AdminDashboardProps {
   user: {
@@ -19,9 +20,11 @@ interface AdminDashboardProps {
       exams: number
     }
   }
+  numberOfStudentsPaid: number
+  licenseExpiry: string | null
 }
 
-export function AdminDashboard({ user, school }: AdminDashboardProps) {
+export function AdminDashboard({ user, school, numberOfStudentsPaid, licenseExpiry }: AdminDashboardProps) {
   const router = useRouter()
 
   const handleSignOut = async () => {
@@ -40,7 +43,7 @@ export function AdminDashboard({ user, school }: AdminDashboardProps) {
         <div className="w-full px-4 py-4 md:px-6 md:py-6 border-b border-white/10">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black text-white">Admin Dashboard</h1>
+              <h1 className="text-2xl md:text-3xl font-black text-white">School Dashboard</h1>
               <p className="text-sm md:text-base text-gray-400 mt-1">Welcome back, {user.name}</p>
             </div>
             <Button
@@ -55,26 +58,11 @@ export function AdminDashboard({ user, school }: AdminDashboardProps) {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 py-6 md:py-8 lg:py-12">
-          {/* School Info */}
-          <Card className="bg-white/5 backdrop-blur-xl border border-white/10 mb-6 md:mb-8">
-            <CardBody className="p-4 md:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h2 className="text-xl md:text-2xl font-bold text-white mb-2">{school.name}</h2>
-                  <p className="text-sm md:text-base text-gray-400">School Code: <span className="text-white font-semibold">{school.schoolCode}</span></p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    school.isActive 
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30" 
-                      : "bg-red-500/20 text-red-400 border border-red-500/30"
-                  }`}>
-                    {school.isActive ? "Active" : "Inactive"}
-                  </span>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
+          {/* School Name and Code */}
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">{school.name}</h2>
+            <p className="text-sm md:text-base text-gray-400">School Code: <span className="text-white font-semibold">{school.schoolCode}</span></p>
+          </div>
 
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
