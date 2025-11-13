@@ -64,26 +64,42 @@ export function AdminDashboard({ user, school, numberOfStudentsPaid, licenseExpi
             <p className="text-sm md:text-base text-gray-400">School Code: <span className="text-white font-semibold">{school.schoolCode}</span></p>
           </div>
 
+          {/* License Information */}
+          <LicenseInfo
+            isActive={school.isActive}
+            licenseExpiry={licenseExpiry ? new Date(licenseExpiry) : null}
+            numberOfStudentsPaid={numberOfStudentsPaid}
+            currentStudentsCount={school._count.students}
+          />
+
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
             <Card className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
               <CardBody className="p-4 md:p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-white mb-2">{school._count.students}</div>
-                <div className="text-xs md:text-sm text-gray-400">Total Students</div>
+                <div className="text-3xl md:text-4xl font-black text-white mb-2">
+                  {school._count.students}/{numberOfStudentsPaid.toLocaleString()}
+                </div>
+                <div className="text-xs md:text-sm text-gray-400">Students</div>
               </CardBody>
             </Card>
 
             <Card className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
               <CardBody className="p-4 md:p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-white mb-2">{school._count.teachers}</div>
-                <div className="text-xs md:text-sm text-gray-400">Total Teachers</div>
+                <div className="text-3xl md:text-4xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                  {school._count.teachers}
+                  <span className="text-2xl md:text-3xl text-gray-400">∞</span>
+                </div>
+                <div className="text-xs md:text-sm text-gray-400">Teachers</div>
               </CardBody>
             </Card>
 
             <Card className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
               <CardBody className="p-4 md:p-6 text-center">
-                <div className="text-3xl md:text-4xl font-black text-white mb-2">{school._count.exams}</div>
-                <div className="text-xs md:text-sm text-gray-400">Total Exams</div>
+                <div className="text-3xl md:text-4xl font-black text-white mb-2 flex items-center justify-center gap-2">
+                  {school._count.exams}
+                  <span className="text-2xl md:text-3xl text-gray-400">∞</span>
+                </div>
+                <div className="text-xs md:text-sm text-gray-400">Exams</div>
               </CardBody>
             </Card>
           </div>
@@ -150,4 +166,3 @@ export function AdminDashboard({ user, school, numberOfStudentsPaid, licenseExpi
     </div>
   )
 }
-

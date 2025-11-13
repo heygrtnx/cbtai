@@ -24,5 +24,12 @@ export default async function AdminDashboardPage() {
     redirect("/auth/login")
   }
 
-  return <AdminDashboard user={user} school={school} />
+  return (
+    <AdminDashboard
+      user={user}
+      school={school}
+      numberOfStudentsPaid={school.numberOfStudents}
+      licenseExpiry={school.licenseExpiry ? school.licenseExpiry.toISOString() : null}
+    />
+  )
 }
