@@ -1,0 +1,1065 @@
+AI CBT SOFTWARE - PROCESS FLOW DOCUMENTATION
+=============================================
+
+OVERVIEW
+--------
+This document outlines the complete process flow for an AI-powered Computer-Based Testing (CBT) platform designed for Nigerian schools, teachers, and students. The platform is optimized for the Nigerian educational system, payment methods, and connectivity considerations.
+
+TARGET MARKET: NIGERIA
+-----------------------
+- Supports Nigerian educational curricula (Nigerian, British, American)
+- Compatible with WAEC, NECO, JAMB exam formats
+- Payment integration with Nigerian payment gateways
+- Mobile-first design for smartphone users
+- Low-bandwidth optimization
+- SMS and WhatsApp notifications
+- NDPR (Nigeria Data Protection Regulation) compliant
+
+================================================================================
+1. SCHOOL REGISTRATION & PAYMENT SYSTEM
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: School Registration
+  - School administrator visits registration page
+  - Fills in school details:
+    * School name
+    * School registration number (if applicable)
+    * School type (Primary, Secondary, Tertiary, Mixed)
+    * School address (State, LGA, City, Street address)
+    * Contact information (email, phone - Nigerian format: +234...)
+    * Administrator name and credentials
+    * Number of expected students (for pricing calculation)
+    * Number of campuses/branches (if multi-campus)
+    * Curriculum type (Nigerian, British, American, Mixed)
+  - System validates school information
+  - School account created (pending payment)
+  - System generates unique school code (e.g., SCH-NG-LAG-001)
+
+Step 2: License Fee Calculation
+  - One-time registration fee: NGN 300,000
+  - Per-student fee: NGN 3,000 × number of students
+  - Total initial fee = NGN 300,000 + (NGN 3,000 × student count)
+  - System displays total amount to be paid
+  - Payment plan options (for large schools):
+    * Full payment (5% discount)
+    * 50% upfront + 50% within 30 days
+    * 3-month installment plan (additional 5% fee)
+
+Step 3: Payment Processing (Multiple Gateway Options)
+  - School administrator initiates payment
+  - Payment gateway options:
+    * Paystack (Primary)
+    * Flutterwave (Alternative)
+    * Direct Bank Transfer (with proof upload)
+  - Payment methods available:
+    * Card payment (Visa, Mastercard, Verve)
+    * Bank transfer (NIP - NIBSS Instant Payment)
+    * USSD (*723# codes)
+    * Bank account debit
+    * QR code payment
+  - Payment verification:
+    * Gateway webhook confirms payment status
+    * For bank transfers: Admin uploads payment proof, manual verification within 24 hours
+    * System updates school account status to "Active"
+    * School receives confirmation via:
+      - Email
+      - SMS (Nigerian phone number)
+      - WhatsApp (if number provided)
+    * Access granted to platform
+
+Step 4: Annual Renewal
+  - Renewal fee: NGN 15,000 per year
+  - System sends renewal reminder 30 days before expiration
+  - School administrator processes renewal payment via Paystack
+  - Account validity extended for another year
+
+================================================================================
+2. TEACHER ONBOARDING & AI QUESTION GENERATION
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: Teacher Account Creation
+  - School administrator adds teacher to platform
+  - Administrator assigns:
+    * Teacher ID/Staff number
+    * Subject(s) taught
+    * Class(es) assigned (e.g., JSS1, JSS2, SSS1, Primary 5, etc.)
+    * Department (if applicable)
+  - Teacher receives invitation via:
+    * Email with temporary credentials
+    * SMS with access link (Nigerian phone number)
+    * WhatsApp message (if number provided)
+  - Teacher logs in and sets up profile:
+    * Name
+    * Email
+    * Phone number (Nigerian format)
+    * Subject(s) taught (pre-assigned, can add more)
+    * Class levels assigned
+    * Profile picture (optional)
+    * Qualifications (optional)
+  - Teacher account activated
+  - Teacher can access assigned classes and subjects
+
+Step 2: Exam Type Selection
+  - Teacher selects exam type:
+    * Continuous Assessment (CA) - typically 30-40 questions
+    * Test - typically 20-30 questions
+    * Examination - typically 50-100 questions
+    * Mock Exam (WAEC/NECO/JAMB format)
+    * Quiz - typically 10-15 questions
+  - Teacher selects:
+    * Subject
+    * Class level(s)
+    * Term/Semester (1st Term, 2nd Term, 3rd Term)
+    * Academic session (e.g., 2024/2025)
+
+Step 3: Upload Learning Material
+  - Teacher navigates to "Create Exam" section
+  - Upload options:
+    * Lesson notes (PDF, DOCX, TXT)
+    * Textbook pages (PDF, images - optimized for low bandwidth)
+    * Direct text input
+    * Past question papers (for reference)
+    * WAEC/NECO/JAMB past questions (for format matching)
+  - System processes uploaded material:
+    * Extracts text content (OCR for images)
+    * Analyzes structure and topics
+    * Identifies key concepts
+    * Prepares for AI question generation
+  - File size limits: Max 10MB per file (compressed automatically)
+
+Step 4: AI Question Generation Setup
+  - System prompts teacher with configuration options:
+    * Number of multiple-choice questions needed
+    * Number of theory questions needed (if applicable)
+    * Subject/Topic
+    * Difficulty level (Easy, Medium, Hard, Mixed)
+    * Question distribution across topics (if applicable)
+    * Bloom's Taxonomy level (Remember, Understand, Apply, Analyze, Evaluate, Create)
+    * Question format preference (WAEC style, NECO style, JAMB style, Custom)
+  - Teacher specifies requirements
+  - System validates input
+  - System estimates generation time (typically 2-5 minutes)
+
+Step 5: AI Question Generation
+  - AI engine processes uploaded material
+  - Generates multiple-choice questions:
+    * Ensures no duplicate questions (checks against question bank)
+    * Creates unique questions based on content
+    * Generates 4 options per question (1 correct, 3 distractors)
+    * Assigns difficulty level
+    * Follows selected exam format (WAEC/NECO/JAMB style if chosen)
+  - Generates theory questions (if requested):
+    * Creates essay-type questions
+    * Suggests marking scheme
+    * Sets expected answer length
+  - System displays generated questions for review
+  - Progress indicator shows generation status
+
+Step 6: Timing Configuration
+  - System prompts: "What should the timing be?"
+  - Teacher sets:
+    * Total exam duration (e.g., 60 minutes, 90 minutes, 2 hours)
+    * Time per question (optional, if different from total)
+    * Start date and time (Nigerian timezone - WAT)
+    * End date and time
+    * Late submission allowed? (Yes/No, with penalty percentage)
+    * Time extension for special needs students (optional)
+  - System validates timing settings
+  - System checks for scheduling conflicts with other exams
+
+Step 7: Exam Security Settings
+  - Teacher configures:
+    * Exam password (optional, for additional security)
+    * Question randomization (Yes/No)
+    * Option randomization (Yes/No - shuffle A, B, C, D)
+    * Prevent tab switching (Yes/No)
+    * Require webcam monitoring (Yes/No - for proctoring)
+    * Allow exam rescheduling (Yes/No)
+    * Maximum attempts allowed (default: 1)
+
+Step 8: Question Review & Editing
+  - Teacher reviews AI-generated questions
+  - Can:
+    * Edit questions (text, options, correct answer)
+    * Delete unwanted questions
+    * Add manual questions
+    * Reorder questions (drag and drop)
+    * Mark questions for review
+    * Preview question paper (as students will see it)
+    * Print question paper (for backup/offline use)
+    * Save questions to question bank for reuse
+  - Teacher saves exam draft
+  - System validates exam completeness before publishing
+
+================================================================================
+3. QUESTION CREATION (TEXT & IMAGE, MULTICHOICE & THEORY)
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: Question Type Selection
+  - Teacher chooses question type:
+    * Multiple Choice
+    * Theory/Essay
+
+Step 2: Multiple Choice Question Creation
+  Option A: Text-based Multiple Choice
+    - Teacher enters question text
+    - Adds 4 answer options
+    - Marks correct answer
+    - Optionally adds explanation for answer
+  
+  Option B: Image-based Multiple Choice
+    - Teacher uploads image (JPG, PNG, PDF)
+    - Adds question text (optional, can be image-only)
+    - Adds 4 answer options
+    - Marks correct answer
+    - Optionally adds explanation
+
+Step 3: Theory Question Creation
+  Option A: Text-based Theory
+    - Teacher enters question text
+    - Sets expected answer length (optional)
+    - Adds marking scheme/rubric (optional)
+    - Sets accuracy tolerance percentage (70% - 100%)
+  
+  Option B: Image-based Theory
+    - Teacher uploads image
+    - Adds question text (optional)
+    - Sets expected answer length
+    - Adds marking scheme/rubric
+    - Sets accuracy tolerance percentage
+
+Step 4: AI-Assisted Question Creation
+  - Teacher can request AI to create questions
+  - AI generates question based on uploaded material
+  - Teacher reviews and edits if needed
+
+Step 5: Question Management
+  - Questions saved to question bank
+  - Can be reused in future exams
+  - Can be organized by subject, topic, difficulty
+
+================================================================================
+4. STUDENT ONBOARDING (CSV UPLOAD & ACCESS CODES)
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: Prepare Student Data
+  - Teacher/Administrator prepares CSV file with columns:
+    * Student Name (required)
+    * Student Surname (required)
+    * Student First Name (required)
+    * Student Middle Name (optional)
+    * Student Email (optional)
+    * Student Phone Number (optional, Nigerian format)
+    * Student ID/Matric Number/Admission Number (required)
+    * Class/Level (required - e.g., JSS1A, JSS2B, SSS1 Science, Primary 5)
+    * Date of Birth (optional, DD/MM/YYYY format)
+    * Gender (optional)
+    * Parent/Guardian Name (optional)
+    * Parent/Guardian Phone (optional, for notifications)
+    * Parent/Guardian Email (optional)
+    * Additional custom fields (optional)
+  - CSV template available for download
+  - Supports bulk import (up to 1000 students per upload)
+
+Step 2: CSV Upload
+  - Teacher navigates to "Students" section
+  - Clicks "Import Students"
+  - Uploads CSV file
+  - System validates CSV format:
+    * Checks required columns
+    * Validates data format
+    * Reports any errors
+
+Step 3: Data Processing
+  - System processes CSV file
+  - Creates student accounts for each row
+  - Generates unique access code for each student:
+    * Format: [SCHOOL_CODE]-[STUDENT_ID]-[RANDOM_STRING]
+    * Example: ABC123-STU001-X7K9M2
+  - Stores access codes securely
+
+Step 4: Access Code Distribution
+  - System generates access code report:
+    * CSV export with student names and access codes
+    * Printable format for distribution (Nigerian format)
+    * PDF format with school letterhead (optional)
+  - Distribution options:
+    * Print and distribute physically
+    * Send via SMS to student/parent phone (if provided)
+    * Send via WhatsApp (if number provided)
+    * Email to student/parent (if email provided)
+    * Bulk SMS via Termii/SendChamp integration
+  - Teacher/Administrator distributes access codes to students
+  - Students can view their access code in their account (if email/phone provided)
+  - Access codes are case-insensitive for ease of use
+
+Step 5: Student Account Activation
+  - Student visits platform login page (mobile-optimized)
+  - Enters access code (or scans QR code if provided)
+  - System validates access code
+  - If first time:
+    * Student sets password (minimum 6 characters)
+    * Completes profile:
+      - Confirms name
+      - Adds phone number (if not provided)
+      - Adds email (if not provided)
+      - Sets security question (for password recovery)
+    * Accepts terms and conditions
+  - Student account activated
+  - Student receives welcome message via SMS/WhatsApp
+  - Student can now access assigned exams
+
+Step 6: Parent/Guardian Account (Optional)
+  - If parent/guardian details provided:
+    * System creates parent account
+    * Parent receives invitation via SMS/WhatsApp/Email
+    * Parent can:
+      - View child's exam schedule
+      - View child's results (when released)
+      - Receive notifications about child's performance
+      - Contact teacher through platform
+    * Parent login: Uses phone number or email + password
+
+================================================================================
+5. EXAM TAKING & RESULT MANAGEMENT
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: Exam Assignment
+  - Teacher assigns exam to:
+    * Specific students
+    * Entire class
+    * Multiple classes
+  - Exam settings applied:
+    * Start date and time
+    * End date and time
+    * Duration per attempt
+    * Number of attempts allowed
+    * Show results immediately (Yes/No)
+
+Step 2: Student Exam Access
+  - Student logs in with access code
+  - Views available exams in dashboard
+  - Sees exam details:
+    * Exam name
+    * Subject
+    * Duration
+    * Start/End time
+    * Status (Upcoming, Active, Completed)
+
+Step 3: Exam Taking Process
+  - Student clicks "Start Exam"
+  - System confirms:
+    * Exam has started (within time frame)
+    * Student has attempts remaining
+    * Internet connectivity check (with offline mode fallback)
+  - Pre-exam checklist:
+    * Device compatibility check
+    * Browser compatibility (Chrome, Firefox, Safari, Edge)
+    * Network speed test (warns if slow)
+    * Instructions displayed
+  - Student confirms readiness
+  - Timer starts (if duration set)
+  - Exam interface displays (mobile-responsive):
+    * Question navigation (previous/next, question list)
+    * Timer countdown (prominent, color-coded warnings)
+    * Progress indicator (X of Y questions answered)
+    * Save/Submit buttons
+    * Network status indicator
+    * Auto-save status indicator
+  
+  For Multiple Choice Questions:
+    - Student selects answer (tap/click)
+    - Answer auto-saved immediately (with confirmation)
+    - Can review and change before submission
+    - Visual indicator shows answered/unanswered questions
+    - Can flag questions for review
+  
+  For Theory Questions:
+    - Student types answer in text area (mobile-optimized keyboard)
+    - Answer auto-saved every 30 seconds (or on pause)
+    - Character count indicator (if limit set)
+    - Can review and edit before submission
+    - Spell check available (optional)
+  
+  Offline Mode (for poor connectivity):
+    - Exam questions cached locally
+    - Answers saved locally if connection lost
+    - Auto-sync when connection restored
+    - Warning displayed if offline
+    - Student can continue exam offline
+    - Answers uploaded when connection restored
+
+Step 4: Exam Submission
+  - Student clicks "Submit Exam"
+  - System shows confirmation dialog:
+    * "Are you sure you want to submit? You have X unanswered questions."
+    * Option to go back and review
+  - If confirmed:
+    * System attempts submission
+    * If offline: Queued for submission when online
+    * Timer stops
+    * Exam marked as "Completed"
+    * Answers saved to database
+    * Submission receipt generated
+  - Student cannot retake exam (unless multiple attempts allowed)
+
+Step 5: Result Processing
+  - Multiple Choice Questions:
+    * Auto-graded immediately upon submission
+    * Score calculated: (Correct answers / Total questions) × 100
+    * Grade assigned (A, B, C, D, E, F) based on Nigerian grading system:
+      - A: 70-100% (Excellent)
+      - B: 60-69% (Very Good)
+      - C: 50-59% (Good)
+      - D: 45-49% (Credit)
+      - E: 40-44% (Pass)
+      - F: 0-39% (Fail)
+  
+  - Theory Questions:
+    * If "Show results immediately" = No:
+      - Queued for teacher review
+      - AI grading applied automatically (for teacher reference)
+      - Teacher reviews and grades manually
+      - Teacher can accept/modify AI score
+      - Results released after teacher approval
+    * If "Show results immediately" = Yes:
+      - AI grading applied immediately
+      - Score calculated based on accuracy tolerance
+      - Results displayed to student
+      - Teacher can still review and adjust later
+
+Step 6: Result Display
+  - If immediate results enabled:
+    * Student sees results immediately after submission
+    * Results page shows:
+      - Total score (percentage and grade)
+      - Score per question
+      - Correct answers (for multiple choice)
+      - Student's answers (highlighted correct/incorrect)
+      - Feedback (for theory questions)
+      - Position in class (if class results released)
+      - Performance graph/chart
+    * Student can:
+      - Print result
+      - Download PDF
+      - Share result (via WhatsApp/SMS)
+  - If immediate results disabled:
+    * Student sees "Results pending" message
+    * Estimated release date shown (if set by teacher)
+    * Results available after teacher review
+    * Notification sent when results are released
+
+Step 7: Result Management (Teacher Side)
+  - Teacher views all exam results
+  - Result dashboard shows:
+    * Total students who took exam
+    * Average score
+    * Pass rate (percentage)
+    * Grade distribution (A, B, C, D, E, F counts)
+    * Highest and lowest scores
+    * Questions with most errors
+  - Teacher can:
+    * View individual student results
+    * View class performance comparison
+    * Export results to:
+      - CSV (for Excel)
+      - PDF (Nigerian result sheet format)
+      - Print format (with school letterhead)
+    * Generate result sheets (bulk)
+    * View statistics (average score, pass rate, etc.)
+    * Review and adjust theory question grades
+    * Release results to students (if not immediate)
+    * Release results to parents (if parent accounts exist)
+    * Set result release date
+    * Hide/show specific result details
+    * Export for report card generation
+
+Step 8: Report Card Generation
+  - System can generate comprehensive report cards:
+    * Student personal information
+    * All exam results for term/semester
+    * Continuous Assessment (CA) scores
+    * Final examination scores
+    * Overall average
+    * Position in class
+    * Teacher comments
+    * Principal's remarks
+    * Next term date
+  - Formats:
+    * Nigerian standard format
+    * Customizable with school branding
+    * Print-ready PDF
+    * Can be emailed to parents
+
+================================================================================
+6. THEORY QUESTION GRADING WITH ACCURACY TOLERANCE
+================================================================================
+
+PROCESS FLOW:
+-------------
+
+Step 1: Accuracy Tolerance Configuration
+  - When creating theory question, teacher sets:
+    * Accuracy tolerance: 70% - 100% (default: 70%)
+    * This determines how closely student answer must match expected answer
+
+Step 2: AI Grading Process
+  - Student submits theory answer
+  - AI grading engine processes answer:
+    * Extracts key concepts from student answer
+    * Compares with expected answer/key points
+    * Calculates semantic similarity
+    * Applies accuracy tolerance threshold
+
+Step 3: Scoring Calculation
+  - If similarity score ≥ accuracy tolerance:
+    * Question marked as correct
+    * Full marks awarded
+  - If similarity score < accuracy tolerance:
+    * Partial credit calculation:
+      Score = (Similarity Score / Accuracy Tolerance) × Full Marks
+    * Example:
+      - Full marks: 10
+      - Accuracy tolerance: 80%
+      - Student similarity: 65%
+      - Score: (65% / 80%) × 10 = 8.125 points
+
+Step 4: Teacher Review (Optional)
+  - Teacher can review AI-graded theory questions
+  - Can:
+    * Accept AI score
+    * Adjust score manually
+    * Add feedback/comments
+    * Request re-grading
+
+Step 5: Result Finalization
+  - Final scores calculated
+  - Results saved to database
+  - Made available to student (based on immediate results setting)
+
+================================================================================
+ADDITIONAL FEATURES & CONSIDERATIONS
+================================================================================
+
+SECURITY & EXAM INTEGRITY:
+--------------------------
+- Access codes are unique and non-guessable
+- Exam sessions are time-bound
+- Answers are auto-saved to prevent data loss
+- Secure authentication for all users
+- Exam integrity measures:
+  * Prevent tab switching (optional)
+  * Prevent copy/paste during exam
+  * Screen recording detection (optional)
+  * Webcam monitoring (optional proctoring)
+  * IP address tracking
+  * Device fingerprinting
+  * Question and option randomization
+  * Exam password protection
+- Two-factor authentication (optional for teachers/admins)
+- Session timeout for inactive users
+- Audit logs for all actions
+- Data encryption at rest and in transit
+
+NOTIFICATIONS (MULTI-CHANNEL):
+-------------------------------
+- Email notifications for:
+  * School registration confirmation
+  * Payment confirmations
+  * Teacher invitations
+  * Exam assignments
+  * Result availability
+  * Renewal reminders
+  * Password reset links
+
+- SMS notifications (via Termii/SendChamp):
+  * Access code delivery
+  * Exam reminders (24 hours, 1 hour before)
+  * Result availability
+  * Payment confirmations
+  * Important announcements
+  * Low balance warnings (for SMS credits)
+
+- WhatsApp notifications (via WhatsApp Business API):
+  * Access code delivery
+  * Exam reminders
+  * Result notifications
+  * Quick updates
+  * Interactive messages
+
+- In-app notifications:
+  * Real-time updates
+  * Notification center
+  * Mark as read/unread
+
+REPORTING & ANALYTICS:
+----------------------
+- School-level analytics:
+  * Overall performance metrics
+  * Student enrollment trends
+  * Exam completion rates
+  * Payment history and reports
+  * Usage statistics
+
+- Teacher performance metrics:
+  * Exams created
+  * Questions generated
+  * Grading efficiency
+  * Student performance in their subjects
+
+- Student performance tracking:
+  * Performance over time (graphs)
+  * Subject-wise performance
+  * Weak areas identification
+  * Improvement trends
+  * Comparison with class average
+
+- Exam statistics:
+  * Participation rate
+  * Average scores
+  * Pass/fail rates
+  * Question difficulty analysis
+  * Time taken per question
+  * Most common mistakes
+
+- Class management:
+  * Class performance comparison
+  * Student ranking
+  * Subject-wise rankings
+  * Term/semester comparisons
+
+STUDENT MANAGEMENT:
+-------------------
+- Bulk operations:
+  * Bulk student import/export
+  * Bulk class assignment
+  * Bulk deactivation/reactivation
+  * Bulk access code regeneration
+
+- Class management:
+  * Create/edit/delete classes
+  * Assign students to classes
+  * Transfer students between classes
+  * Class promotion (end of term)
+  * Class grouping (e.g., Science, Arts, Commercial)
+
+- Student lifecycle:
+  * Admission
+  * Class promotion
+  * Graduation
+  * Transfer out
+  * Alumni status
+
+ACADEMIC CALENDAR:
+------------------
+- Term/Semester management:
+  * Create academic sessions (e.g., 2024/2025)
+  * Define terms (1st, 2nd, 3rd Term)
+  * Set term dates
+  * Holiday calendar
+  * Exam periods
+
+- Exam scheduling:
+  * Calendar view of all exams
+  * Conflict detection
+  * Rescheduling options
+  * Make-up exam scheduling
+
+MOBILE OPTIMIZATION:
+--------------------
+- Progressive Web App (PWA) support
+- Mobile-responsive design (all screens)
+- Touch-optimized interface
+- Offline capability
+- Low bandwidth optimization:
+  * Image compression
+  * Lazy loading
+  * Minimal data usage
+  * Cached content
+
+- Mobile-specific features:
+  * QR code scanning for access
+  * Mobile camera for image uploads
+  * Voice input (optional, for theory questions)
+  * Mobile-friendly result viewing
+
+DATA MANAGEMENT:
+----------------
+- Data backup:
+  * Automated daily backups
+  * Cloud storage (Backblaze B2, Google Cloud)
+  * Local backup option
+  * Backup restoration
+
+- Data export:
+  * Export all school data
+  * Export student records
+  * Export exam results
+  * Export payment history
+  * GDPR/NDPR compliant exports
+
+- Data privacy (NDPR compliant):
+  * Student data protection
+  * Parent consent management
+  * Data retention policies
+  * Right to deletion
+  * Data access requests
+
+TECHNICAL REQUIREMENTS:
+-----------------------
+- Payment gateways:
+  * Paystack API integration
+  * Flutterwave API integration
+  * Bank transfer handling
+  * Payment webhook processing
+
+- AI/ML services:
+  * Question generation engine
+  * Theory grading engine
+  * OCR for image processing
+  * Natural language processing
+  * Semantic similarity analysis
+
+- Communication services:
+  * SMS gateway (Termii, SendChamp)
+  * WhatsApp Business API
+  * Email service (SendGrid, Mailgun)
+  * Push notifications
+
+- File handling:
+  * CSV import/export
+  * PDF generation and processing
+  * Image upload and optimization
+  * Document OCR
+  * File compression
+
+- Infrastructure:
+  * Cloud hosting (Vercel, Railway, DigitalOcean, etc.)
+  * CDN for fast content delivery
+  * Load balancing
+  * Database (PostgreSQL/MySQL)
+  * Redis for caching
+  * Real-time timer functionality
+  * Auto-save mechanism
+  * Secure access code generation
+  * API for third-party integrations
+
+- Performance:
+  * Fast page load times
+  * Efficient database queries
+  * Caching strategies
+  * Image optimization
+  * Code minification
+
+SUPPORT & TRAINING:
+-------------------
+- Onboarding support:
+  * School setup assistance
+  * Teacher training sessions
+  * Student orientation
+  * Video tutorials
+  * Documentation
+
+- Customer support:
+  * Help center/FAQ
+  * Live chat support
+  * Email support
+  * Phone support (Nigerian numbers)
+  * WhatsApp support
+  * Support tickets system
+
+- Training materials:
+  * Video tutorials (YouTube)
+  * Written guides
+  * Webinars
+  * In-person training (optional)
+
+LOCALIZATION:
+-------------
+- Nigerian English variants
+- Date format: DD/MM/YYYY
+- Time format: 12-hour (with AM/PM) or 24-hour
+- Currency: NGN (₦)
+- Timezone: WAT (West Africa Time)
+- Phone number format: +234 XXX XXX XXXX
+- Support for Nigerian states and LGAs
+- Nigerian educational terminology
+
+INTEGRATIONS:
+-------------
+- School Management Systems (SMS) integration
+- Learning Management Systems (LMS) integration
+- Student Information Systems (SIS) integration
+- Accounting software integration
+- Third-party analytics tools
+- API for custom integrations
+
+BACKUP & DISASTER RECOVERY:
+---------------------------
+- Automated backups (daily)
+- Point-in-time recovery
+- Disaster recovery plan
+- Data redundancy
+- Failover systems
+
+================================================================================
+EDGE CASES & SPECIAL SCENARIOS
+================================================================================
+
+EXAM RESCHEDULING:
+------------------
+- Teacher can reschedule exam:
+  * Change start/end date and time
+  * Extend duration
+  * Notify all affected students
+  * Students who already started can continue or restart (based on settings)
+
+- Student requests rescheduling:
+  * Student submits request with reason
+  * Teacher approves/rejects
+  * If approved, student gets new exam slot
+  * Original attempt marked as "Rescheduled"
+
+MAKE-UP EXAMS:
+--------------
+- For students who missed exam:
+  * Teacher creates make-up exam
+  * Assigns to specific students
+  * Different questions (optional)
+  * Same or different duration
+  * Results marked as "Make-up"
+
+- For technical issues:
+  * Student reports issue during exam
+  * System logs incident
+  * Teacher reviews and approves make-up
+  * Student gets new attempt
+
+EXAM INTERRUPTIONS:
+-------------------
+- Network disconnection:
+  * Answers saved locally
+  * Auto-sync when reconnected
+  * Timer pauses (optional) or continues
+  * Student can resume where left off
+
+- Device failure:
+  * Student can continue on another device
+  * Answers preserved
+  * Teacher can grant extension if needed
+
+- Power outage:
+  * Answers auto-saved
+  * System tracks time lost
+  * Teacher can grant time extension
+  * Student resumes exam
+
+SPECIAL NEEDS ACCOMMODATIONS:
+------------------------------
+- Extended time:
+  * Teacher can set individual time extensions
+  * Applied automatically during exam
+  * No special marking on result
+
+- Alternative formats:
+  * Larger text size
+  * Audio questions (text-to-speech)
+  * Voice answers (speech-to-text)
+  * Screen reader compatibility
+
+- Additional support:
+  * Extra attempts allowed
+  * Reduced question count (same percentage)
+  * Separate exam session
+
+BULK OPERATIONS:
+---------------
+- Bulk exam assignment:
+  * Assign to multiple classes at once
+  * Assign to all students in school
+  * Filter by class, level, subject
+
+- Bulk result release:
+  * Release all results at once
+  * Release by class
+  * Release by exam type
+
+- Bulk notifications:
+  * Send to all students
+  * Send to all parents
+  * Send to all teachers
+  * Filter by criteria
+
+ERROR HANDLING:
+---------------
+- Payment failures:
+  * Retry mechanism
+  * Alternative payment method suggested
+  * Manual verification option
+  * Support contact provided
+
+- Upload failures:
+  * File size too large: Compression suggested
+  * Invalid format: Format requirements shown
+  * Network error: Retry option
+  * Progress saved for large files
+
+- Generation failures:
+  * AI question generation timeout: Retry option
+  * Insufficient content: Warning shown
+  * Error logging for support
+
+- Submission failures:
+  * Network error: Retry submission
+  * Server error: Answers preserved, contact support
+  * Timeout: Extension granted if technical issue
+
+DATA VALIDATION:
+----------------
+- CSV import validation:
+  * Required fields check
+  * Format validation (email, phone)
+  * Duplicate detection
+  * Error report with line numbers
+  * Partial import option (valid rows only)
+
+- Student data validation:
+  * Unique admission numbers
+  * Valid class assignments
+  * Age validation (if DOB provided)
+  * Phone number format (+234...)
+
+- Exam validation:
+  * Minimum question count
+  * At least one correct answer per MCQ
+  * Valid date ranges
+  * No scheduling conflicts
+
+ACCESS CODE MANAGEMENT:
+------------------------
+- Lost access codes:
+  * Student can request reset
+  * Teacher can regenerate
+  * Admin can view all codes
+  * Bulk regeneration option
+
+- Access code security:
+  * Expiration (optional)
+  * One-time use (optional)
+  * IP restriction (optional)
+  * Device limit (optional)
+
+PAYMENT SCENARIOS:
+------------------
+- Partial payment:
+  * System tracks payment status
+  * Limited access until full payment
+  * Payment reminders sent
+  * Grace period (optional)
+
+- Refund requests:
+  * School submits refund request
+  * Admin reviews and processes
+  * Refund via original payment method
+  * Account status updated
+
+- Payment disputes:
+  * Dispute logging
+  * Evidence collection
+  * Resolution process
+  * Account status management
+
+================================================================================
+SUCCESS METRICS & KPIs
+================================================================================
+
+SCHOOL METRICS:
+---------------
+- Registration conversion rate
+- Payment completion rate
+- Renewal rate
+- Average students per school
+- Active usage rate
+
+TEACHER METRICS:
+----------------
+- Teacher adoption rate
+- Exams created per teacher
+- Questions generated per exam
+- Grading efficiency
+- Platform engagement
+
+STUDENT METRICS:
+----------------
+- Student activation rate
+- Exam completion rate
+- Average exam score
+- Platform usage frequency
+- Result viewing rate
+
+TECHNICAL METRICS:
+------------------
+- System uptime
+- Page load times
+- Error rates
+- API response times
+- Payment success rate
+- SMS/Email delivery rates
+
+BUSINESS METRICS:
+-----------------
+- Revenue per school
+- Customer acquisition cost
+- Customer lifetime value
+- Churn rate
+- Net Promoter Score (NPS)
+
+================================================================================
+FUTURE ENHANCEMENTS (ROADMAP)
+================================================================================
+
+PHASE 2 FEATURES:
+-----------------
+- Video questions (recorded explanations)
+- Audio questions and answers
+- Collaborative exams (group work)
+- Peer assessment
+- Gamification (badges, leaderboards)
+- Adaptive testing (difficulty adjusts to student)
+- Plagiarism detection for theory answers
+- Advanced analytics dashboard
+- Mobile apps (iOS and Android)
+- Biometric authentication
+- Blockchain-based certificate generation
+
+PHASE 3 FEATURES:
+-----------------
+- AI-powered personalized learning paths
+- Virtual proctoring with AI
+- Integration with Nigerian examination bodies
+- Multi-language support (Hausa, Yoruba, Igbo)
+- Offline-first architecture
+- Advanced reporting for education ministry
+- Parent-teacher communication platform
+- Student portfolio system
+- Career guidance integration
+
+================================================================================
+END OF PROCESS FLOW DOCUMENTATION
+================================================================================
+

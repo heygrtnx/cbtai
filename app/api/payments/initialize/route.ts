@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from "next/server"
+import { db } from "@/lib/db"
+import { PaymentMethod, PaymentStatus } from "@prisma/client"
+import { initializePaystackPayment, initializeFlutterwavePayment } from "@/lib/utils/payment"
+import crypto from "crypto"
+
+export async function POST(request: NextRequest) {
+  try {
+    const { schoolId, amount, method } = await request.json()
+
+    if (!schoolId || !amount || !method) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
+    const school = await db.school.findUnique({
+      where: { id: schoolId },
+    })
+
+    if (!school) {
+      return NextResponse.json(
+        { error: "School not found" },
+        { status: 404 }
+      )
+    }
+
+    // Generate payment reference
+    const reference = `PAY-${school.schoolCode}-${crypto.randomBytes(8).toString("hex").toUpperCase()}`
+
+    // Create payment record
+    const payment = await db.payment.create({
+      data: {
+        schoolId,
+        amount: parseFloat(amount),
+        method: method as PaymentMethod,
+        reference,
+        status: PaymentStatus.PENDING,
+        description: `License fee payment for ${school.name}`,
+      },
+    })
+
+    // Initialize payment gateway
+    let paymentResponse
+
+    if (method === PaymentMethod.PAYSTACK) {
+      paymentResponse = await initializePaystackPayment(
+        amount,
+        school.email,
+        reference,
+        { schoolId, schoolCode: school.schoolCode }
+      )
+    } else if (method === PaymentMethod.FLUTTERWAVE) {
+      paymentResponse = await initializeFlutterwavePayment(
+        amount,
+        school.email,
+        reference,
+        { schoolId, schoolCode: school.schoolCode }
+      )
+    } else {
+      // Bank transfer - manual verification
+      return NextResponse.json({
+        success: true,
+        paymentId: payment.id,
+        reference,
+        method: "BANK_TRANSFER",
+        message: "Please upload payment proof for verification",
+      })
+    }
+
+    if (!paymentResponse.success) {
+      return NextResponse.json(
+        { error: paymentResponse.message || "Payment initialization failed" },
+        { status: 500 }
+      )
+    }
+
+    // Update payment with transaction ID if available
+    if (paymentResponse.transactionId) {
+      await db.payment.update({
+        where: { id: payment.id },
+        data: { transactionId: paymentResponse.transactionId },
+      })
+    }
+
+    return NextResponse.json({
+      success: true,
+      paymentId: payment.id,
+      reference: paymentResponse.reference,
+      authorizationUrl: paymentResponse.transactionId, // For Paystack, this is the authorization URL
+      method,
+    })
+  } catch (error) {
+    console.error("Payment initialization error:", error)
+    return NextResponse.json(
+      { error: "Payment initialization failed" },
+      { status: 500 }
+    )
+  }
+}
+
