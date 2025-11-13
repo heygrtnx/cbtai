@@ -56,15 +56,20 @@ export default function RegisterSchoolPage() {
 
       setSchoolId(data.schoolId)
 
-      const oneTimeFee = 300000
-      const perStudentFee = 3000
-      const total = oneTimeFee + perStudentFee * formData.numberOfStudents
-
-      setFees({
-        oneTimeFee,
-        perStudentFee,
-        total,
-      })
+      // Use fees from API response (calculated server-side with env vars)
+      if (data.fees) {
+        setFees(data.fees)
+      } else {
+        // Fallback to client-side calculation if API doesn't return fees
+        const oneTimeFee = parseInt(process.env.NEXT_PUBLIC_LICENSE_FEE || "300000")
+        const perStudentFee = parseInt(process.env.NEXT_PUBLIC_COST_PER_STUDENT || "3000")
+        const total = oneTimeFee + perStudentFee * formData.numberOfStudents
+        setFees({
+          oneTimeFee,
+          perStudentFee,
+          total,
+        })
+      }
       setStep(2)
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.")
@@ -425,7 +430,7 @@ export default function RegisterSchoolPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400 transition-colors"
                       >
                         {showPassword ? (
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,11 +450,11 @@ export default function RegisterSchoolPage() {
 
               <div className="glass-card p-4 rounded-xl border border-white/10">
                 <p className="text-sm text-gray-300">
-                  <strong className="text-white">License Fee:</strong> ₦300,000 (one-time) + ₦3,000 per student
+                  <strong className="text-white">License Fee:</strong> ₦{parseInt(process.env.NEXT_PUBLIC_LICENSE_FEE || "300000").toLocaleString()} (one-time) + ₦{parseInt(process.env.NEXT_PUBLIC_COST_PER_STUDENT || "3000").toLocaleString()} per student
                 </p>
                 {formData.numberOfStudents > 0 && (
                   <p className="text-sm text-gray-300 mt-2">
-                    <strong className="text-white">Estimated Total:</strong> ₦{(300000 + 3000 * formData.numberOfStudents).toLocaleString()}
+                    <strong className="text-white">Estimated Total:</strong> ₦{(parseInt(process.env.NEXT_PUBLIC_LICENSE_FEE || "300000") + parseInt(process.env.NEXT_PUBLIC_COST_PER_STUDENT || "3000") * formData.numberOfStudents).toLocaleString()}
                   </p>
                 )}
               </div>

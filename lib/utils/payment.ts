@@ -140,8 +140,8 @@ export function calculateLicenseFee(studentCount: number): {
   perStudentFee: number
   total: number
 } {
-  const oneTimeFee = 300000 // NGN 300,000
-  const perStudentFee = 3000 // NGN 3,000 per student
+  const oneTimeFee = parseInt(process.env.LICENSE_FEE || "300000")
+  const perStudentFee = parseInt(process.env.COST_PER_STUDENT || "3000")
   const total = oneTimeFee + perStudentFee * studentCount
 
   return {
@@ -151,5 +151,5 @@ export function calculateLicenseFee(studentCount: number): {
   }
 }
 
-export const RENEWAL_FEE = 15000 // NGN 15,000 per year
+export const RENEWAL_FEE = parseInt(process.env.RENEWAL_FEE || "15000")
 

@@ -5,12 +5,24 @@ import Link from "next/link"
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [particles, setParticles] = useState<Array<{ left: string; top: string; delay: string; duration: string }>>([])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
     window.addEventListener("mousemove", handleMouseMove)
+    
+    // Generate particles only on client side
+    setParticles(
+      Array.from({ length: 20 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        delay: `${Math.random() * 5}s`,
+        duration: `${3 + Math.random() * 4}s`,
+      }))
+    )
+    
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
 
@@ -93,11 +105,15 @@ export default function Home() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 sm:pt-16 border-t border-white/10 mt-12 sm:mt-16">
               <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-black text-white mb-2">300K+</div>
+                <div className="text-3xl sm:text-4xl font-black text-white mb-2">
+                  ₦{(parseInt(process.env.NEXT_PUBLIC_LICENSE_FEE || "300000") / 1000).toFixed(0)}K+
+                </div>
                 <div className="text-xs sm:text-sm text-gray-400">One-time License</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-black text-white mb-2">₦3K</div>
+                <div className="text-3xl sm:text-4xl font-black text-white mb-2">
+                  ₦{(parseInt(process.env.NEXT_PUBLIC_COST_PER_STUDENT || "3000") / 1000).toFixed(0)}K
+                </div>
                 <div className="text-xs sm:text-sm text-gray-400">Per Student</div>
               </div>
               <div className="text-center">
@@ -667,20 +683,22 @@ export default function Home() {
         </footer>
 
         {/* Floating particles effect */}
-        <div className="fixed inset-0 pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`,
-              }}
-            />
-          ))}
-        </div>
+        {particles.length > 0 && (
+          <div className="fixed inset-0 pointer-events-none">
+            {particles.map((particle, i) => (
+              <div
+                key={i}
+                className="absolute w-1 h-1 bg-white/30 rounded-full animate-float"
+                style={{
+                  left: particle.left,
+                  top: particle.top,
+                  animationDelay: particle.delay,
+                  animationDuration: particle.duration,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
