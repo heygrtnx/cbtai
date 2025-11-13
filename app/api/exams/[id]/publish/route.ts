@@ -5,11 +5,11 @@ import { ExamStatus } from "@prisma/client"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth()
-    const examId = params.id
+    const { id: examId } = await params
 
     const exam = await db.exam.findUnique({
       where: { id: examId },

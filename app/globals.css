@@ -123,5 +123,65 @@
 	}
 	body {
 		@apply bg-background text-foreground;
+		overflow-x: hidden;
 	}
+	html {
+		overflow-x: hidden;
+		scroll-behavior: smooth;
+	}
+	* {
+		scroll-behavior: smooth;
+	}
+}
+
+/* Glassmorphism utilities */
+.glass-card {
+	background: rgba(255, 255, 255, 0.05);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+}
+
+.glass-card-strong {
+	background: rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(30px);
+	-webkit-backdrop-filter: blur(30px);
+}
+
+/* Animations */
+@keyframes float {
+	0%, 100% {
+		transform: translateY(0) translateX(0);
+		opacity: 0.3;
+	}
+	50% {
+		transform: translateY(-20px) translateX(10px);
+		opacity: 0.6;
+	}
+}
+
+@keyframes gradient {
+	0%, 100% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+}
+
+.animate-float {
+	animation: float 6s ease-in-out infinite;
+}
+
+.animate-gradient {
+	background-size: 200% 200%;
+	animation: gradient 3s ease infinite;
+}
+
+/* Delay utilities */
+.delay-1000 {
+	animation-delay: 1s;
+}
+
+.delay-2000 {
+	animation-delay: 2s;
 }

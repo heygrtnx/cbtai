@@ -28,7 +28,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			suppressHydrationWarning>
-			<body className={cn("m-auto min-h-screen bg-background bg-center bg-no-repeat scroll-smooth antialiased")}>
+			<body className={cn("min-h-screen bg-black text-white scroll-smooth antialiased")}>
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="light"
@@ -40,14 +40,16 @@ export default function RootLayout({
 						easing="ease"
 					/>
 					<Header />
-					<MaxWidthWrapper>{children}</MaxWidthWrapper>
+					<main className="w-full">
+						{children}
+					</main>
 
 					<Toaster
 						position="top-right"
 						expand={false}
 					/>
-					<GoogleAnalytics gaId="" />
-					<GoogleTagManager gtmId="" />
+					{process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
+					{process.env.NEXT_PUBLIC_GTM_ID && <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />}
 				</ThemeProvider>
 			</body>
 		</html>

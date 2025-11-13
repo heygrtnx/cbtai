@@ -6,7 +6,7 @@ import { calculateGrade, gradeTheoryAnswer, calculateTheoryScore } from "@/lib/u
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { attemptId: string } }
+  { params }: { params: Promise<{ attemptId: string }> }
 ) {
   try {
     const user = await requireAuth()
@@ -18,7 +18,7 @@ export async function POST(
       )
     }
 
-    const attemptId = params.attemptId
+    const { attemptId } = await params
     const { answers } = await request.json()
 
     // Get attempt
@@ -67,7 +67,15 @@ export async function POST(
     let questionsCorrect = 0
     let questionsAnswered = 0
 
-    const answerRecords = []
+    const answerRecords: Array<{
+      attemptId: string
+      questionId: string
+      selectedOption: string | null
+      answerText: string | null
+      isCorrect: boolean
+      score: number
+      aiScore: number | null
+    }> = []
 
     for (const answerData of answers) {
       const question = attempt.exam.questions.find(

@@ -4,6 +4,7 @@ export interface PaymentGatewayResponse {
   success: boolean
   reference: string
   transactionId?: string
+  authorizationUrl?: string
   message?: string
 }
 
@@ -37,6 +38,7 @@ export async function initializePaystackPayment(
         success: true,
         reference: data.data.reference,
         transactionId: data.data.access_code,
+        authorizationUrl: data.data.authorization_url,
       }
     }
 

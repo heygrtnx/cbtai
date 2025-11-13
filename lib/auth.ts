@@ -18,7 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!credentials) return null
 
         // Handle access code login (for students)
-        if (credentials.accessCode) {
+        if (credentials.accessCode && typeof credentials.accessCode === 'string') {
           const accessCode = await db.accessCode.findUnique({
             where: { code: credentials.accessCode.toUpperCase() },
             include: {
@@ -38,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return {
             id: user.id,
             email: user.email,
+            phone: user.phone,
             name: user.name,
             role: user.role,
             schoolId: accessCode.student.schoolId,
@@ -45,11 +46,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         // Handle email/phone + password login
+        if (!credentials.password) return null
+        
         const user = await db.user.findFirst({
           where: {
             OR: [
-              { email: credentials.email },
-              { phone: credentials.phone },
+              ...(credentials.email ? [{ email: credentials.email }] : []),
+              ...(credentials.phone ? [{ phone: credentials.phone }] : []),
             ],
           },
           include: {
@@ -62,7 +65,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!user || !user.isActive) return null
 
         const isValidPassword = await bcrypt.compare(
-          credentials.password,
+          credentials.password as string,
           user.password
         )
 

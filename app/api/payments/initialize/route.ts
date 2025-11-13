@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       success: true,
       paymentId: payment.id,
       reference: paymentResponse.reference,
-      authorizationUrl: paymentResponse.transactionId, // For Paystack, this is the authorization URL
+      authorizationUrl: paymentResponse.authorizationUrl || paymentResponse.transactionId,
       method,
     })
   } catch (error) {
