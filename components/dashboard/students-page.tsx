@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { motion } from "framer-motion"
 
 interface Student {
   id: string
@@ -43,6 +44,7 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "success" | "error">("idle")
   const [uploadedCount, setUploadedCount] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobile, setIsMobile] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -77,6 +79,18 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
       }
     } catch (err) {
       console.error("Failed to fetch students:", err)
+    }
+  }
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true)
+    try {
+      await fetchStudents()
+      toast.success("Students list refreshed!", { duration: 2000 })
+    } catch (error) {
+      toast.error("Failed to refresh students list")
+    } finally {
+      setIsRefreshing(false)
     }
   }
 
@@ -454,6 +468,56 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                   >
                     Add New Student
                   </Button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      onClick={handleRefresh}
+                      variant="bordered"
+                      className="border-white/20 bg-white/5 hover:bg-white/10 text-white"
+                      startContent={
+                        isRefreshing ? (
+                          <motion.span
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          >
+                            🔄
+                          </motion.span>
+                        ) : (
+                          <span>🔄</span>
+                        )
+                      }
+                      size="sm"
+                      isLoading={isRefreshing}
+                      disabled={isRefreshing}
+                    >
+                      <span className="hidden sm:inline">Refresh</span>
+                      <span className="sm:hidden">Refresh</span>
+                    </Button>
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      as={Link}
+                      href="/dashboard/admin/upgrade"
+                      variant="bordered"
+                      className="border-green-500/50 bg-green-500/10 hover:bg-green-500/20 text-green-400 hover:text-green-300 relative overflow-hidden group"
+                      startContent={<span>⬆️</span>}
+                      size="sm"
+                    >
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/20 to-green-500/0"
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      <span className="relative z-10 hidden sm:inline">Upgrade License</span>
+                      <span className="relative z-10 sm:hidden">Upgrade</span>
+                    </Button>
+                  </motion.div>
                   <Button
                     onClick={handleDownloadAll}
                     variant="bordered"

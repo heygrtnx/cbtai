@@ -37,10 +37,14 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Delete all students (cascade will delete users)
-    await db.student.deleteMany({
+    // Delete all students and their associated users
+    // Get user IDs first
+    const userIds = students.map(s => s.userId)
+    
+    // Delete users (this will cascade delete students due to schema)
+    await db.user.deleteMany({
       where: {
-        id: { in: studentIds },
+        id: { in: userIds },
       },
     })
 

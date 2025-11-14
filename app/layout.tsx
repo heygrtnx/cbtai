@@ -49,7 +49,23 @@ export default function RootLayout({
 
 						<Toaster
 							position="top-right"
-							expand={false}
+							expand={true}
+							richColors
+							closeButton
+							toastOptions={{
+								classNames: {
+									toast: "bg-black/90 backdrop-blur-xl border border-white/10 shadow-2xl",
+									title: "text-white font-semibold",
+									description: "text-gray-300",
+									actionButton: "bg-white/10 hover:bg-white/20 text-white",
+									cancelButton: "bg-white/5 hover:bg-white/10 text-gray-300",
+									success: "border-green-500/50",
+									error: "border-red-500/50",
+									warning: "border-yellow-500/50",
+									info: "border-blue-500/50",
+								},
+								duration: 4000,
+							}}
 						/>
 						{process.env.NEXT_PUBLIC_GA_ID && <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />}
 						{process.env.NEXT_PUBLIC_GTM_ID && <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID} />}

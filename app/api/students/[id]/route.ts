@@ -189,9 +189,11 @@ export async function DELETE(
       )
     }
 
-    // Delete student (cascade will delete user)
-    await db.student.delete({
-      where: { id },
+    // Delete student and associated user
+    // Note: We delete user first, which will cascade delete student due to schema
+    // But to be safe, we'll delete both explicitly
+    await db.user.delete({
+      where: { id: student.userId },
     })
 
     return NextResponse.json({

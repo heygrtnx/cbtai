@@ -8,64 +8,47 @@ interface ToastOptions {
 	message: string;
 	duration?: number; // Optional duration in milliseconds
 	position?: ToastPosition;
+	description?: string;
+	action?: {
+		label: string;
+		onClick: () => void;
+	};
 }
 
-export const showToast = ({ type, message, duration = 2000, position = "top-center" }: ToastOptions) => {
-	const baseStyle = {
-		color: "#fff",
+export const showToast = ({ 
+	type, 
+	message, 
+	duration = 4000, 
+	position = "top-right",
+	description,
+	action 
+}: ToastOptions) => {
+	const baseOptions = {
+		duration,
+		position: position as any,
+		description,
+		action: action ? {
+			label: action.label,
+			onClick: action.onClick,
+		} : undefined,
 	};
 
-	// Define background colors for each type
-	const backgroundColors: Record<ToastType, string> = {
-		success: "#4CAF50", // Success color (green)
-		error: "#FF5722", // Error color (red)
-		info: "#2196F3", // Info color (blue)
-		warning: "#FFC107", // Warning color (yellow-orange)
-	};
-
-	// Call the appropriate toast function based on the type with the duration and position
+	// Call the appropriate toast function based on the type
 	switch (type) {
 		case "success":
-			toast.success(message, {
-				duration,
-				style: {
-					...baseStyle,
-					backgroundColor: backgroundColors.success,
-				},
-				position,
-			});
+			toast.success(message, baseOptions);
 			break;
 		case "error":
-			toast.error(message, {
-				duration,
-				style: {
-					...baseStyle,
-					backgroundColor: backgroundColors.error,
-				},
-				position,
-			});
+			toast.error(message, baseOptions);
 			break;
 		case "info":
-			toast(message, {
-				duration,
-				style: {
-					...baseStyle,
-					backgroundColor: backgroundColors.info,
-				},
-				position,
-			});
+			toast.info(message, baseOptions);
 			break;
 		case "warning":
-			toast(message, {
-				duration,
-				style: {
-					...baseStyle,
-					backgroundColor: backgroundColors.warning,
-				},
-				position,
-			});
+			toast.warning(message, baseOptions);
 			break;
 		default:
 			console.error("❌ [NOTIFICATION] Invalid toast type:", type);
+			toast(message, baseOptions);
 	}
 };
