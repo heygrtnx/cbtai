@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate access code
-    const accessCode = await createAccessCode(student.id)
+    const accessCode = await createAccessCode(student.id, school.schoolCode)
 
     // Send access code notification
     if (userRecord.email || userRecord.phone) {
