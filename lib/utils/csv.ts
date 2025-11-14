@@ -4,17 +4,27 @@ import { z } from "zod"
 export const StudentCSVSchema = z.object({
   "Student Surname": z.string().min(1),
   "Student First Name": z.string().min(1),
-  "Student Middle Name": z.string().optional(),
-  "Student Email": z.string().email().optional().or(z.literal("")),
+  "Student Middle Name": z.string().optional().or(z.literal("")),
+  "Student Email": z.string().optional().or(z.literal("")).transform((val) => {
+    if (!val || val.trim() === "") return undefined
+    const trimmed = val.trim()
+    // Only return if it looks like an email (contains @)
+    return trimmed.includes("@") ? trimmed : undefined
+  }),
   "Student Phone Number": z.string().optional().or(z.literal("")),
-  "Student ID/Matric Number/Admission Number": z.string().min(1),
+  "Student ID/Matric Number/Admission Number": z.string().optional().or(z.literal("")),
   "Class/Level": z.string().min(1),
   "Date of Birth": z.string().optional().or(z.literal("")),
   "Gender": z.string().optional().or(z.literal("")),
   "Parent/Guardian Name": z.string().optional().or(z.literal("")),
   "Parent/Guardian Phone": z.string().optional().or(z.literal("")),
-  "Parent/Guardian Email": z.string().email().optional().or(z.literal("")),
-})
+  "Parent/Guardian Email": z.string().optional().or(z.literal("")).transform((val) => {
+    if (!val || val.trim() === "") return undefined
+    const trimmed = val.trim()
+    // Only return if it looks like an email (contains @)
+    return trimmed.includes("@") ? trimmed : undefined
+  }),
+}).passthrough() // Allow extra fields in CSV
 
 export type StudentCSVRow = z.infer<typeof StudentCSVSchema>
 
@@ -23,9 +33,12 @@ export interface CSVParseResult {
   errors: Array<{ row: number; message: string }>
 }
 
-export function parseStudentCSV(file: File): Promise<CSVParseResult> {
+export async function parseStudentCSV(file: File | Blob): Promise<CSVParseResult> {
+  // Convert File/Blob to text for server-side parsing
+  const text = await file.text()
+  
   return new Promise((resolve) => {
-    Papa.parse(file, {
+    Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {

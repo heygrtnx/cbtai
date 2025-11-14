@@ -39,15 +39,38 @@ export async function POST(request: NextRequest) {
     
     const data = createStudentSchema.parse(body)
 
-    // Get school
+    // Get school with current student count
     const school = await db.school.findUnique({
       where: { id: user.schoolId! },
+      include: {
+        _count: {
+          select: {
+            students: true,
+          },
+        },
+      },
     })
 
     if (!school) {
       return NextResponse.json(
         { error: "School not found" },
         { status: 404 }
+      )
+    }
+
+    // Check license limit
+    const currentStudentCount = school._count.students
+    const licenseLimit = school.numberOfStudents
+
+    if (currentStudentCount >= licenseLimit) {
+      return NextResponse.json(
+        {
+          error: "License limit reached",
+          message: `You have reached your license limit of ${licenseLimit} students. Please upgrade your plan to add more students.`,
+          currentCount: currentStudentCount,
+          limit: licenseLimit,
+        },
+        { status: 403 }
       )
     }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Chip } from "@heroui/react"
+import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Chip, Pagination } from "@heroui/react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -40,8 +40,12 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
   const [editingStudent, setEditingStudent] = useState<Student | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvUploading, setCsvUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0 })
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobile, setIsMobile] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -92,6 +96,17 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
     )
   })
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedStudents = filteredStudents.slice(startIndex, endIndex)
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchQuery])
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault()
@@ -135,9 +150,15 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
       const data = await response.json()
 
       if (!response.ok) {
-        const errorMessage = data.error || data.details?.[0]?.message || `Failed to ${editingStudent ? "update" : "create"} student`
-        toast.error(errorMessage)
-        setError(errorMessage)
+        if (data.error === "License limit reached") {
+          toast.error(data.message || "License limit reached. Please upgrade your plan to add more students.", {
+            duration: 5000,
+          })
+        } else {
+          const errorMessage = data.error || data.details?.[0]?.message || `Failed to ${editingStudent ? "update" : "create"} student`
+          toast.error(errorMessage)
+          setError(errorMessage)
+        }
         return
       }
 
@@ -237,29 +258,125 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
 
     setError("")
     setCsvUploading(true)
+    setUploadProgress(0)
+    setProcessingProgress({ current: 0, total: 0 })
 
     try {
+      // First, parse CSV to get total record count
+      const text = await csvFile.text()
+      const lines = text.split('\n').filter(line => line.trim())
+      const estimatedTotalRecords = Math.max(0, lines.length - 1) // Subtract header
+      setProcessingProgress({ current: 0, total: estimatedTotalRecords })
+
       const formData = new FormData()
       formData.append("file", csvFile)
 
-      const response = await fetch("/api/students/upload", {
-        method: "POST",
-        body: formData,
+      // Use XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest()
+
+      const response = await new Promise<{ ok: boolean; data: any }>((resolve, reject) => {
+        xhr.upload.addEventListener("progress", (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100)
+            setUploadProgress(percentComplete)
+          }
+        })
+
+        xhr.addEventListener("load", () => {
+          // File upload complete, now processing
+          setUploadProgress(100)
+          
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const data = JSON.parse(xhr.responseText)
+              // Update processing progress based on response
+              if (data.created !== undefined) {
+                setProcessingProgress({ current: data.created, total: estimatedTotalRecords })
+              }
+              resolve({ ok: true, data })
+            } catch (e) {
+              reject(new Error("Failed to parse response"))
+            }
+          } else {
+            try {
+              const data = JSON.parse(xhr.responseText)
+              resolve({ ok: false, data })
+            } catch (e) {
+              reject(new Error(`Upload failed with status ${xhr.status}`))
+            }
+          }
+        })
+
+        xhr.addEventListener("error", () => {
+          reject(new Error("Upload failed"))
+        })
+
+        xhr.addEventListener("abort", () => {
+          reject(new Error("Upload aborted"))
+        })
+
+        xhr.open("POST", "/api/students/upload")
+        xhr.send(formData)
       })
 
-      const data = await response.json()
+      const data = response.data
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to upload CSV")
+        if (data.limitReached || data.error === "License limit reached") {
+          toast.error(data.message || "License limit reached. Please upgrade your plan to add more students.", {
+            duration: 5000,
+          })
+        } else if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+          // Show validation errors
+          const errorMessages = data.errors.map((e: any) => `Row ${e.row}: ${e.message}`).join("\n")
+          toast.error(data.message || `CSV validation errors:\n${errorMessages}`, {
+            duration: 8000,
+          })
+        } else {
+          toast.error(data.message || data.error || "Failed to upload CSV", {
+            duration: 5000,
+          })
+        }
+        setError(data.message || data.error || "Failed to upload CSV")
+        return
       }
 
-      toast.success("CSV uploaded successfully!")
+      if (data.limitReached) {
+        toast.warning(data.message || `Uploaded ${data.created} students. ${data.skipped} were skipped due to license limit.`, {
+          duration: 6000,
+        })
+      } else if (data.duplicates && data.duplicates > 0) {
+        toast.warning(data.message || `Uploaded ${data.created} student(s). ${data.duplicates} duplicate record(s) were skipped.`, {
+          duration: 6000,
+        })
+      } else {
+        toast.success(data.message || `Successfully uploaded ${data.created} student(s)!`)
+      }
+      
+      // Show errors if any (including duplicates)
+      if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+        const errorMessages = data.errors.map((e: any) => `Row ${e.row}: ${e.message}`).join("\n")
+        if (data.errors.length <= 10) {
+          toast.info(`Details:\n${errorMessages}`, {
+            duration: 8000,
+          })
+        } else {
+          toast.info(`${data.errors.length} records had issues. Check the console for details.`, {
+            duration: 6000,
+          })
+          console.log("Upload errors:", data.errors)
+        }
+      }
       setCsvFile(null)
+      setUploadProgress(0)
+      setProcessingProgress({ current: 0, total: 0 })
       await fetchStudents()
     } catch (err: any) {
       const errorMessage = err.message || "Failed to upload CSV"
       toast.error(errorMessage)
       setError(errorMessage)
+      setUploadProgress(0)
+      setProcessingProgress({ current: 0, total: 0 })
     } finally {
       setCsvUploading(false)
     }
@@ -421,15 +538,16 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                     </Button>
                   )}
                 </div>
-              ) : isMobile ? (
-                // Mobile Card View
-                <div className="space-y-3">
-                  {filteredStudents.map((student) => (
-                    <Card key={student.id} className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all">
-                      <CardBody className="p-4">
-                        <div className="flex items-start justify-between gap-3 mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+              ) : (
+                <>
+                {/* Mobile Card View */}
+                {isMobile && (
+                  <div className="space-y-4">
+                    {paginatedStudents.map((student) => (
+                      <Card key={student.id} className="bg-white/5 border border-white/10">
+                        <CardBody className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3 flex-1">
                               <Checkbox
                                 isSelected={selectedStudents.has(student.id)}
                                 onValueChange={(checked) => handleSelectStudent(student.id, checked)}
@@ -440,49 +558,69 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                               />
                               <h3 className="font-bold text-white text-base">{student.user?.name || "N/A"}</h3>
                             </div>
-                            <div className="space-y-1 text-xs text-gray-400">
-                              <p><span className="text-gray-500">Admission:</span> {student.admissionNumber}</p>
-                              <p><span className="text-gray-500">Email:</span> {student.user?.email || "N/A"}</p>
-                              <p><span className="text-gray-500">Phone:</span> {student.user?.phone || "N/A"}</p>
-                            </div>
                           </div>
-                        </div>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {student.class?.name && (
-                            <Chip size="sm" variant="flat" className="bg-white/10 text-white">
-                              {student.class.name}
-                            </Chip>
-                          )}
-                          {student.gender && (
-                            <Chip size="sm" variant="flat" className="bg-white/10 text-white">
-                              {student.gender}
-                            </Chip>
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="light"
-                            onPress={() => handleEdit(student)}
-                            className="text-blue-400 hover:text-blue-300 flex-1"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="light"
-                            onPress={() => handleDelete(student.id)}
-                            className="text-red-400 hover:text-red-300 flex-1"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  ))}
-                </div>
-              ) : (
-                // Desktop Table View
+                          <div className="space-y-1 text-xs text-gray-400">
+                            <p><span className="text-gray-500">Admission:</span> {student.admissionNumber}</p>
+                            <p><span className="text-gray-500">Email:</span> {student.user?.email || "N/A"}</p>
+                            <p><span className="text-gray-500">Phone:</span> {student.user?.phone || "N/A"}</p>
+                          </div>
+                          <div className="flex flex-wrap gap-2 mb-3 mt-3">
+                            {student.class?.name && (
+                              <Chip size="sm" variant="flat" className="bg-white/10 text-white">
+                                {student.class.name}
+                              </Chip>
+                            )}
+                            {student.gender && (
+                              <Chip size="sm" variant="flat" className="bg-white/10 text-white">
+                                {student.gender}
+                              </Chip>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="light"
+                              onPress={() => handleEdit(student)}
+                              className="text-blue-400 hover:text-blue-300 flex-1"
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="light"
+                              onPress={() => handleDelete(student.id)}
+                              className="text-red-400 hover:text-red-300 flex-1"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    ))}
+                    {totalPages > 1 && (
+                      <div className="flex flex-col items-center gap-4 mt-4">
+                        <Pagination
+                          total={totalPages}
+                          page={currentPage}
+                          onChange={setCurrentPage}
+                          size="sm"
+                          classNames={{
+                            wrapper: "gap-0",
+                            item: "bg-white/5 text-white border-white/10",
+                            cursor: "bg-white text-black",
+                            prev: "bg-white/5 text-white",
+                            next: "bg-white/5 text-white",
+                          }}
+                        />
+                        <span className="text-sm text-gray-400">
+                          Showing {startIndex + 1} to {Math.min(endIndex, filteredStudents.length)} of {filteredStudents.length} students
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {/* Desktop Table View */}
+                {!isMobile && (
                 <div className="overflow-x-auto">
                   <Table 
                     aria-label="Students table"
@@ -514,7 +652,7 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                       <TableColumn width={150}>ACTIONS</TableColumn>
                     </TableHeader>
                     <TableBody>
-                      {filteredStudents.map((student) => (
+                      {paginatedStudents.map((student) => (
                         <TableRow key={student.id}>
                           <TableCell>
                             <Checkbox
@@ -572,7 +710,53 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                       ))}
                     </TableBody>
                   </Table>
+                  {totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 px-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400">Rows per page:</span>
+                        <Select
+                          selectedKeys={[itemsPerPage.toString()]}
+                          onSelectionChange={(keys) => {
+                            const value = Array.from(keys)[0] as string
+                            setItemsPerPage(Number(value))
+                            setCurrentPage(1)
+                          }}
+                          size="sm"
+                          className="w-20"
+                          classNames={{
+                            trigger: "bg-white/5 border-white/10 text-white",
+                            popoverContent: "bg-black border-white/10",
+                          }}
+                        >
+                          <SelectItem key="10" value="10">10</SelectItem>
+                          <SelectItem key="25" value="25">25</SelectItem>
+                          <SelectItem key="50" value="50">50</SelectItem>
+                          <SelectItem key="100" value="100">100</SelectItem>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-400">
+                          Showing {startIndex + 1} to {Math.min(endIndex, filteredStudents.length)} of {filteredStudents.length} students
+                        </span>
+                      </div>
+                      <Pagination
+                        total={totalPages}
+                        page={currentPage}
+                        onChange={setCurrentPage}
+                        size="sm"
+                        classNames={{
+                          wrapper: "gap-0",
+                          item: "bg-white/5 text-white border-white/10",
+                          cursor: "bg-white text-black",
+                          prev: "bg-white/5 text-white",
+                          next: "bg-white/5 text-white",
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
+                )}
+                </>
               )}
             </CardBody>
           </Card>
@@ -919,13 +1103,55 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                     <input
                       type="file"
                       accept=".csv"
-                      onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
-                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer"
+                      onChange={(e) => {
+                        setCsvFile(e.target.files?.[0] || null)
+                        setUploadProgress(0)
+                      }}
+                      disabled={csvUploading}
+                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                     {csvFile && (
-                      <p className="text-xs text-gray-400 mt-2">Selected: {csvFile.name}</p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Selected: {csvFile.name} ({(csvFile.size / 1024).toFixed(2)} KB)
+                      </p>
                     )}
                   </div>
+                  {csvUploading && (
+                    <div className="space-y-4">
+                      {/* File Upload Progress */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Uploading file...</span>
+                          <span className="text-white font-semibold">{uploadProgress}%</span>
+                        </div>
+                        <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
+                          <div
+                            className="bg-gradient-to-r from-white to-gray-300 h-full rounded-full transition-all duration-300 ease-out shadow-lg"
+                            style={{ width: `${uploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                      {/* Processing Progress */}
+                      {uploadProgress === 100 && processingProgress.total > 0 && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-400">Processing records...</span>
+                            <span className="text-white font-semibold">
+                              {processingProgress.current} / {processingProgress.total}
+                            </span>
+                          </div>
+                          <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
+                            <div
+                              className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-300 ease-out shadow-lg"
+                              style={{ 
+                                width: `${processingProgress.total > 0 ? Math.round((processingProgress.current / processingProgress.total) * 100) : 0}%` 
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div className="p-4 bg-white/5 rounded-lg border border-white/10">
                     <p className="text-sm text-gray-300 mb-2">
                       <strong className="text-white">Need a template?</strong> Download the CSV template first to see the required format.
