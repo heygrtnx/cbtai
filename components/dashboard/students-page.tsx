@@ -40,8 +40,9 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
   const [editingStudent, setEditingStudent] = useState<Student | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [csvUploading, setCsvUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0 })
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "success" | "error">("idle")
+  const [uploadedCount, setUploadedCount] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isMobile, setIsMobile] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
@@ -258,76 +259,30 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
 
     setError("")
     setCsvUploading(true)
-    setUploadProgress(0)
-    setProcessingProgress({ current: 0, total: 0 })
+    setUploadStatus("uploading")
+    setUploadedCount(0)
 
     try {
-      // First, parse CSV to get total record count
-      const text = await csvFile.text()
-      const lines = text.split('\n').filter(line => line.trim())
-      const estimatedTotalRecords = Math.max(0, lines.length - 1) // Subtract header
-      setProcessingProgress({ current: 0, total: estimatedTotalRecords })
-
       const formData = new FormData()
       formData.append("file", csvFile)
 
-      // Use XMLHttpRequest for progress tracking
-      const xhr = new XMLHttpRequest()
-
-      const response = await new Promise<{ ok: boolean; data: any }>((resolve, reject) => {
-        xhr.upload.addEventListener("progress", (e) => {
-          if (e.lengthComputable) {
-            const percentComplete = Math.round((e.loaded / e.total) * 100)
-            setUploadProgress(percentComplete)
-          }
-        })
-
-        xhr.addEventListener("load", () => {
-          // File upload complete, now processing
-          setUploadProgress(100)
-          
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              const data = JSON.parse(xhr.responseText)
-              // Update processing progress based on response
-              if (data.created !== undefined) {
-                setProcessingProgress({ current: data.created, total: estimatedTotalRecords })
-              }
-              resolve({ ok: true, data })
-            } catch (e) {
-              reject(new Error("Failed to parse response"))
-            }
-          } else {
-            try {
-              const data = JSON.parse(xhr.responseText)
-              resolve({ ok: false, data })
-            } catch (e) {
-              reject(new Error(`Upload failed with status ${xhr.status}`))
-            }
-          }
-        })
-
-        xhr.addEventListener("error", () => {
-          reject(new Error("Upload failed"))
-        })
-
-        xhr.addEventListener("abort", () => {
-          reject(new Error("Upload aborted"))
-        })
-
-        xhr.open("POST", "/api/students/upload")
-        xhr.send(formData)
+      // Use fetch for faster, cleaner upload
+      setUploadStatus("processing")
+      
+      const response = await fetch("/api/students/upload", {
+        method: "POST",
+        body: formData,
       })
 
-      const data = response.data
+      const data = await response.json()
 
       if (!response.ok) {
+        setUploadStatus("error")
         if (data.limitReached || data.error === "License limit reached") {
           toast.error(data.message || "License limit reached. Please upgrade your plan to add more students.", {
             duration: 5000,
           })
         } else if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
-          // Show validation errors
           const errorMessages = data.errors.map((e: any) => `Row ${e.row}: ${e.message}`).join("\n")
           toast.error(data.message || `CSV validation errors:\n${errorMessages}`, {
             duration: 8000,
@@ -339,6 +294,26 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
         }
         setError(data.message || data.error || "Failed to upload CSV")
         return
+      }
+
+      // Success!
+      setUploadStatus("success")
+      setUploadedCount(data.created || 0)
+      
+      // Animate count up
+      if (data.created > 0) {
+        let current = 0
+        const target = data.created
+        const increment = Math.max(1, Math.floor(target / 20))
+        const timer = setInterval(() => {
+          current += increment
+          if (current >= target) {
+            setUploadedCount(target)
+            clearInterval(timer)
+          } else {
+            setUploadedCount(current)
+          }
+        }, 30)
       }
 
       if (data.limitReached) {
@@ -367,16 +342,19 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
           console.log("Upload errors:", data.errors)
         }
       }
-      setCsvFile(null)
-      setUploadProgress(0)
-      setProcessingProgress({ current: 0, total: 0 })
-      await fetchStudents()
+
+      // Wait a bit to show success animation, then refresh and close
+      setTimeout(async () => {
+        await fetchStudents()
+        setCsvFile(null)
+        setUploadStatus("idle")
+        onBulkUploadClose()
+      }, 2000)
     } catch (err: any) {
+      setUploadStatus("error")
       const errorMessage = err.message || "Failed to upload CSV"
       toast.error(errorMessage)
       setError(errorMessage)
-      setUploadProgress(0)
-      setProcessingProgress({ current: 0, total: 0 })
     } finally {
       setCsvUploading(false)
     }
@@ -1069,9 +1047,13 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
       <Modal 
         isOpen={isBulkUploadOpen} 
         onClose={() => {
-          onBulkUploadClose()
-          setCsvFile(null)
-          setError("")
+          if (uploadStatus !== "uploading" && uploadStatus !== "processing") {
+            onBulkUploadClose()
+            setCsvFile(null)
+            setError("")
+            setUploadStatus("idle")
+            setUploadedCount(0)
+          }
         }}
         size={isMobile ? "full" : "2xl"}
         scrollBehavior="inside"
@@ -1090,109 +1072,205 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                 <p className="text-sm text-gray-400 font-normal">Upload a CSV file to add multiple students at once</p>
               </ModalHeader>
               <ModalBody>
-                {error && (
-                  <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg text-sm">
+                {error && uploadStatus === "error" && (
+                  <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg text-sm animate-pulse">
                     {error}
                   </div>
                 )}
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Select CSV File
-                    </label>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={(e) => {
-                        setCsvFile(e.target.files?.[0] || null)
-                        setUploadProgress(0)
-                      }}
-                      disabled={csvUploading}
-                      className="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-white file:text-black hover:file:bg-gray-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    />
-                    {csvFile && (
-                      <p className="text-xs text-gray-400 mt-2">
-                        Selected: {csvFile.name} ({(csvFile.size / 1024).toFixed(2)} KB)
-                      </p>
-                    )}
-                  </div>
-                  {csvUploading && (
-                    <div className="space-y-4">
-                      {/* File Upload Progress */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-400">Uploading file...</span>
-                          <span className="text-white font-semibold">{uploadProgress}%</span>
-                        </div>
-                        <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
-                          <div
-                            className="bg-gradient-to-r from-white to-gray-300 h-full rounded-full transition-all duration-300 ease-out shadow-lg"
-                            style={{ width: `${uploadProgress}%` }}
-                          />
-                        </div>
+                
+                {/* Upload Status Animations */}
+                {uploadStatus === "uploading" && (
+                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                    <div className="relative">
+                      <div className="w-20 h-20 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-2xl">📤</span>
                       </div>
-                      {/* Processing Progress */}
-                      {uploadProgress === 100 && processingProgress.total > 0 && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-400">Processing records...</span>
-                            <span className="text-white font-semibold">
-                              {processingProgress.current} / {processingProgress.total}
-                            </span>
-                          </div>
-                          <div className="w-full bg-white/5 rounded-full h-2.5 overflow-hidden border border-white/10">
-                            <div
-                              className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full transition-all duration-300 ease-out shadow-lg"
-                              style={{ 
-                                width: `${processingProgress.total > 0 ? Math.round((processingProgress.current / processingProgress.total) * 100) : 0}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
                     </div>
-                  )}
-                  <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <p className="text-sm text-gray-300 mb-2">
-                      <strong className="text-white">Need a template?</strong> Download the CSV template first to see the required format.
-                    </p>
-                    <Button
-                      onClick={handleDownloadTemplate}
-                      variant="light"
-                      size="sm"
-                      className="text-white"
-                    >
-                      📄 Download CSV Template
-                    </Button>
+                    <p className="text-white font-semibold animate-pulse">Uploading your file...</p>
                   </div>
-                </div>
+                )}
+
+                {uploadStatus === "processing" && (
+                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                    <div className="relative">
+                      {/* Animated particles */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {[...Array(12)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="absolute w-2 h-2 bg-white rounded-full animate-ping"
+                            style={{
+                              transform: `rotate(${i * 30}deg) translateY(-40px)`,
+                              animationDelay: `${i * 0.1}s`,
+                              animationDuration: '1.5s',
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <div className="w-20 h-20 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-3xl animate-bounce">⚡</span>
+                      </div>
+                    </div>
+                    <p className="text-white font-semibold">Processing students...</p>
+                    <p className="text-gray-400 text-sm">Creating accounts and generating access codes</p>
+                  </div>
+                )}
+
+                {uploadStatus === "success" && (
+                  <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                    {/* Success Animation */}
+                    <div className="relative w-32 h-32 flex items-center justify-center">
+                      {/* Confetti particles */}
+                      {[...Array(20)].map((_, i) => {
+                        const angle = (i * 18) * (Math.PI / 180)
+                        const distance = 50
+                        const x = Math.cos(angle) * distance
+                        const y = Math.sin(angle) * distance
+                        return (
+                          <div
+                            key={i}
+                            className="absolute w-2 h-2 rounded-full animate-ping"
+                            style={{
+                              backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'][i % 5],
+                              left: `calc(50% + ${x}px)`,
+                              top: `calc(50% + ${y}px)`,
+                              animationDelay: `${i * 0.1}s`,
+                              animationDuration: '1.5s',
+                            }}
+                          />
+                        )
+                      })}
+                      <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center animate-scale-in shadow-lg shadow-green-500/50">
+                        <span className="text-5xl">✓</span>
+                      </div>
+                    </div>
+                    <div className="text-center space-y-2">
+                      <p className="text-5xl font-bold text-white animate-count-up bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                        {uploadedCount}
+                      </p>
+                      <p className="text-white font-semibold text-lg">Students Added! 🎉</p>
+                      <p className="text-gray-400 text-sm">Upload completed successfully</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* File Upload Section - Only show when not uploading/processing/success */}
+                {uploadStatus === "idle" && (
+                  <div className="space-y-4">
+                    <div
+                      className={`relative border-2 border-dashed rounded-xl p-8 transition-all duration-300 ${
+                        isDragging
+                          ? "border-blue-500/50 bg-blue-500/10 scale-105"
+                          : csvFile
+                          ? "border-green-500/50 bg-green-500/10"
+                          : "border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/10"
+                      }`}
+                      onDragEnter={(e) => {
+                        e.preventDefault()
+                        setIsDragging(true)
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault()
+                        setIsDragging(false)
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault()
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        setIsDragging(false)
+                        const file = e.dataTransfer.files[0]
+                        if (file && file.name.endsWith('.csv')) {
+                          setCsvFile(file)
+                          setUploadStatus("idle")
+                        }
+                      }}
+                    >
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => {
+                          setCsvFile(e.target.files?.[0] || null)
+                          setUploadStatus("idle")
+                        }}
+                        disabled={csvUploading}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <div className="text-center space-y-3">
+                        <div className={`text-5xl ${csvFile ? "animate-none" : "animate-bounce"}`}>
+                          {isDragging ? "📥" : "📁"}
+                        </div>
+                        {csvFile ? (
+                          <div className="space-y-2">
+                            <p className="text-white font-semibold text-lg">✓ File Selected</p>
+                            <p className="text-gray-400 text-sm">{csvFile.name}</p>
+                            <p className="text-gray-500 text-xs">{(csvFile.size / 1024).toFixed(2)} KB</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <p className="text-white font-semibold">
+                              {isDragging ? "Drop it here!" : "Drop your CSV file here"}
+                            </p>
+                            <p className="text-gray-400 text-sm">or click to browse</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <p className="text-sm text-gray-300 mb-2">
+                        <strong className="text-white">Need a template?</strong> Download the CSV template first to see the required format.
+                      </p>
+                      <Button
+                        onClick={handleDownloadTemplate}
+                        variant="light"
+                        size="sm"
+                        className="text-white hover:scale-105 transition-transform"
+                      >
+                        📄 Download CSV Template
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </ModalBody>
               <ModalFooter className="flex-col sm:flex-row gap-2">
-                <Button
-                  variant="bordered"
-                  onPress={() => {
-                    onBulkUploadClose()
-                    setCsvFile(null)
-                    setError("")
-                  }}
-                  className="border-white/20 bg-white/5 hover:bg-white/10 text-white w-full sm:w-auto"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={async () => {
-                    await handleCsvUpload()
-                    if (!error) {
-                      onBulkUploadClose()
-                      setCsvFile(null)
-                    }
-                  }}
-                  disabled={!csvFile || csvUploading}
-                  isLoading={csvUploading}
-                  className="bg-white text-black hover:bg-gray-200 font-semibold disabled:opacity-50 w-full sm:w-auto"
-                >
-                  {csvUploading ? "Uploading..." : "Upload CSV File"}
-                </Button>
+                {uploadStatus === "idle" && (
+                  <>
+                    <Button
+                      variant="bordered"
+                      onPress={() => {
+                        onBulkUploadClose()
+                        setCsvFile(null)
+                        setError("")
+                        setUploadStatus("idle")
+                      }}
+                      className="border-white/20 bg-white/5 hover:bg-white/10 text-white w-full sm:w-auto"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCsvUpload}
+                      disabled={!csvFile || csvUploading}
+                      className="bg-white text-black hover:bg-gray-200 font-semibold disabled:opacity-50 w-full sm:w-auto hover:scale-105 transition-transform"
+                    >
+                      🚀 Upload CSV File
+                    </Button>
+                  </>
+                )}
+                {uploadStatus === "error" && (
+                  <Button
+                    variant="bordered"
+                    onPress={() => {
+                      setUploadStatus("idle")
+                      setError("")
+                    }}
+                    className="border-white/20 bg-white/5 hover:bg-white/10 text-white w-full sm:w-auto"
+                  >
+                    Try Again
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}
