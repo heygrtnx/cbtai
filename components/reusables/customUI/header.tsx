@@ -7,8 +7,8 @@ import { signOut } from "next-auth/react"
 export default function Header() {
   const pathname = usePathname()
 
-  // Don't show header on landing page, login page, register page, or dashboard pages
-  if (pathname === "/" || pathname?.startsWith("/auth/login") || pathname?.startsWith("/schools/register") || pathname?.startsWith("/dashboard")) {
+  // Don't show header on landing page, login page, register page, dashboard pages, or payment callback
+  if (pathname === "/" || pathname?.startsWith("/auth/login") || pathname?.startsWith("/schools/register") || pathname?.startsWith("/dashboard") || pathname?.startsWith("/payment/callback")) {
     return null
   }
 
