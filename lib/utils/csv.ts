@@ -63,7 +63,7 @@ export async function parseStudentCSV(file: File | Blob): Promise<CSVParseResult
           errors,
         })
       },
-      error: (error) => {
+      error: (error: Error) => {
         resolve({
           data: [],
           errors: [{ row: 0, message: error.message }],

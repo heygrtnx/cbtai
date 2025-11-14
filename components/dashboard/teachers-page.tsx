@@ -132,7 +132,7 @@ Mr. Ibrahim Kolawole,ibrahim.k@example.com,+2348034567890,STAFF003,"Chemistry,Bi
                       }}
                     >
                       {subjects.map((subject) => (
-                        <SelectItem key={subject} value={subject} className="text-white">
+                        <SelectItem key={subject} className="text-white">
                           {subject}
                         </SelectItem>
                       ))}

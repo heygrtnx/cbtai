@@ -93,7 +93,7 @@ Physics Quiz,Physics,QUIZ,2024-11-20 14:00:00,2024-11-20 14:30:00,30,Weekly phys
                       }}
                     >
                       {subjects.map((subject) => (
-                        <SelectItem key={subject} value={subject} className="text-white">
+                        <SelectItem key={subject} className="text-white">
                           {subject}
                         </SelectItem>
                       ))}
@@ -107,11 +107,11 @@ Physics Quiz,Physics,QUIZ,2024-11-20 14:00:00,2024-11-20 14:30:00,30,Weekly phys
                         label: "text-gray-400",
                       }}
                     >
-                      <SelectItem value="CONTINUOUS_ASSESSMENT" className="text-white">Continuous Assessment</SelectItem>
-                      <SelectItem value="TEST" className="text-white">Test</SelectItem>
-                      <SelectItem value="EXAMINATION" className="text-white">Examination</SelectItem>
-                      <SelectItem value="MOCK_EXAM" className="text-white">Mock Exam</SelectItem>
-                      <SelectItem value="QUIZ" className="text-white">Quiz</SelectItem>
+                      <SelectItem key="CONTINUOUS_ASSESSMENT" className="text-white">Continuous Assessment</SelectItem>
+                      <SelectItem key="TEST" className="text-white">Test</SelectItem>
+                      <SelectItem key="EXAMINATION" className="text-white">Examination</SelectItem>
+                      <SelectItem key="MOCK_EXAM" className="text-white">Mock Exam</SelectItem>
+                      <SelectItem key="QUIZ" className="text-white">Quiz</SelectItem>
                     </Select>
                     <Input
                       label="Duration (minutes)"
@@ -152,7 +152,7 @@ Physics Quiz,Physics,QUIZ,2024-11-20 14:00:00,2024-11-20 14:30:00,30,Weekly phys
                       }}
                     >
                       {classes.map((className) => (
-                        <SelectItem key={className} value={className} className="text-white">
+                        <SelectItem key={className} className="text-white">
                           {className}
                         </SelectItem>
                       ))}

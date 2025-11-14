@@ -770,10 +770,10 @@ export function StudentsPage({ students: initialStudents, classes }: StudentsPag
                             popoverContent: "bg-black border-white/10",
                           }}
                         >
-                          <SelectItem key="10" value="10">10</SelectItem>
-                          <SelectItem key="25" value="25">25</SelectItem>
-                          <SelectItem key="50" value="50">50</SelectItem>
-                          <SelectItem key="100" value="100">100</SelectItem>
+                          <SelectItem key="10">10</SelectItem>
+                          <SelectItem key="25">25</SelectItem>
+                          <SelectItem key="50">50</SelectItem>
+                          <SelectItem key="100">100</SelectItem>
                         </Select>
                       </div>
                       <div className="flex items-center gap-2">

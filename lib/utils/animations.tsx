@@ -19,8 +19,8 @@ export const pageVariants: Variants = {
 }
 
 export const pageTransition = {
-  type: "tween",
-  ease: "anticipate",
+  type: "tween" as const,
+  ease: "anticipate" as const,
   duration: 0.4,
 }
 
@@ -186,8 +186,7 @@ export function AnimatedCard({ children, className = "", delay = 0 }: { children
       animate="animate"
       variants={itemVariants}
       transition={{ delay }}
-      whileHover="hover"
-      variants={cardHoverVariants}
+      whileHover={{ scale: 1.02, y: -4 }}
       className={className}
     >
       {children}
