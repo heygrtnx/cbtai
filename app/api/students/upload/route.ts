@@ -65,16 +65,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get school with current student count
+    // Get school
     const school = await db.school.findUnique({
       where: { id: user.schoolId! },
-      include: {
-        _count: {
-          select: {
-            students: true,
-          },
-        },
-      },
     })
 
     if (!school) {
@@ -84,8 +77,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check license limit
-    const currentStudentCount = school._count.students
+    // Get current student count directly from database (ensures accurate count after deletions)
+    const currentStudentCount = await db.student.count({
+      where: {
+        schoolId: school.id,
+      },
+    })
     const licenseLimit = school.numberOfStudents
     const availableSlots = licenseLimit - currentStudentCount
 
